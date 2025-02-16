@@ -46,7 +46,8 @@ export default function ExpenseForm() {
       try {
         const formattedData = {
           ...data,
-          date: data.date.toISOString().split('T')[0],
+          // Format the date as YYYY-MM-DD
+          date: data.date,
           amount: data.amount.toString(),
           description: data.description || "",
           notes: data.notes || "",

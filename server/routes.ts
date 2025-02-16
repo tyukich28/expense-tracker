@@ -7,14 +7,26 @@ import { addExpenseToNotion } from "./services/notion";
 export async function registerRoutes(app: Express) {
   app.post("/api/expenses", async (req, res) => {
     try {
-      const expense = insertExpenseSchema.parse(req.body);
+      // Parse and validate the incoming data
+      const expenseData = {
+        ...req.body,
+        // Convert the date string to a Date object for schema validation
+        date: new Date(req.body.date)
+      };
+
+      const expense = insertExpenseSchema.parse(expenseData);
 
       // Save to local storage
       const created = await storage.createExpense(expense);
 
       // Save to Notion
       try {
-        await addExpenseToNotion(expense);
+        // Convert date back to ISO string for Notion
+        const notionExpense = {
+          ...expense,
+          date: expense.date.toISOString().split('T')[0]
+        };
+        await addExpenseToNotion(notionExpense);
       } catch (notionError) {
         console.error("Failed to save to Notion:", notionError);
         // Continue with response even if Notion save fails
