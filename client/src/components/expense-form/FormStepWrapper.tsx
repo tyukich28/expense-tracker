@@ -7,30 +7,25 @@ interface FormStepWrapperProps {
 
 export default function FormStepWrapper({ children, show }: FormStepWrapperProps) {
   return (
-    <AnimatePresence mode="wait" initial={false}>
-      {show && (
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ 
-            opacity: 1, 
-            y: 0,
-          }}
-          exit={{ 
-            opacity: 0, 
-            y: -20,
-          }}
-          transition={{
-            duration: 0.4,
-            ease: "easeInOut",
-          }}
-          style={{
-            willChange: "opacity, transform"
-          }}
-          className="space-y-4"
-        >
-          {children}
-        </motion.div>
-      )}
-    </AnimatePresence>
+    <div className="relative">
+      <AnimatePresence>
+        {show && (
+          <motion.div
+            layout
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: -20 }}
+            transition={{
+              layout: { duration: 0.3 },
+              opacity: { duration: 0.2 },
+              x: { duration: 0.2 }
+            }}
+            className="absolute inset-0 space-y-4"
+          >
+            {children}
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
   );
 }

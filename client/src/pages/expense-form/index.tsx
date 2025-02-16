@@ -154,215 +154,215 @@ export default function ExpenseForm() {
                   form.handleSubmit((data) => mutate(data))(e);
                 }
               }}
-              className="space-y-6"
+              className="space-y-6 relative min-h-[300px]"
             >
               <ProgressBar currentStep={step} totalSteps={7} />
 
-              <FormStepWrapper show={step === 1}>
-                <h2 className="text-2xl font-bold mb-4">Expense Tracker</h2>
-                <p className="text-gray-600 mb-6">Let's track your expenses!</p>
-                <FormField
-                  control={form.control}
-                  name="user"
-                  render={({ field }) => (
-                    <FormItem className="relative">
-                      <Select
-                        defaultValue={field.value}
-                        onValueChange={(value) => {
-                          field.onChange(value);
-                        }}
-                      >
-                        <SelectTrigger className="focus:scale-105 transition-transform duration-200">
-                          <SelectValue placeholder="Select User" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="Tyler">Tyler</SelectItem>
-                          <SelectItem value="Alexa">Alexa</SelectItem>
-                        </SelectContent>
-                      </Select>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </FormStepWrapper>
-              <FormStepWrapper show={step === 2}>
-                <h2 className="text-xl font-semibold mb-4">Select Category</h2>
-                <FormField
-                  control={form.control}
-                  name="category"
-                  render={({ field }) => (
-                    <FormItem>
-                      <Select
-                        value={field.value}
-                        onValueChange={(value) => {
-                          field.onChange(value);
-                          form.setValue("subCategory", "");
-                        }}
-                      >
-                        <SelectTrigger className="focus:scale-105 transition-transform duration-200">
-                          <SelectValue placeholder="Select Category" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {Object.keys(categories).map((category) => (
-                            <SelectItem key={category} value={category}>
-                              {category}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </FormStepWrapper>
-              <FormStepWrapper show={step === 3}>
-                <h2 className="text-xl font-semibold mb-4">Select Sub-Category</h2>
-                <FormField
-                  control={form.control}
-                  name="subCategory"
-                  render={({ field }) => (
-                    <FormItem>
-                      <Select
-                        value={field.value}
-                        onValueChange={field.onChange}
-                        disabled={!form.getValues("category")}
-                      >
-                        <SelectTrigger className="focus:scale-105 transition-transform duration-200">
-                          <SelectValue placeholder="Select Sub-Category" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {form.getValues("category") &&
-                            categories[form.getValues("category") as keyof typeof categories]?.map((sub) => (
-                              <SelectItem key={sub} value={sub}>
-                                {sub}
+              <div className="relative">
+                <FormStepWrapper show={step === 1} key="step-1">
+                  <h2 className="text-2xl font-bold mb-4">Expense Tracker</h2>
+                  <p className="text-gray-600 mb-6">Let's track your expenses!</p>
+                  <FormField
+                    control={form.control}
+                    name="user"
+                    render={({ field }) => (
+                      <FormItem>
+                        <Select
+                          defaultValue={field.value}
+                          onValueChange={field.onChange}
+                        >
+                          <SelectTrigger className="focus:scale-105 transition-transform duration-200">
+                            <SelectValue placeholder="Select User" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="Tyler">Tyler</SelectItem>
+                            <SelectItem value="Alexa">Alexa</SelectItem>
+                          </SelectContent>
+                        </Select>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </FormStepWrapper>
+                <FormStepWrapper show={step === 2} key="step-2">
+                  <h2 className="text-xl font-semibold mb-4">Select Category</h2>
+                  <FormField
+                    control={form.control}
+                    name="category"
+                    render={({ field }) => (
+                      <FormItem>
+                        <Select
+                          value={field.value}
+                          onValueChange={(value) => {
+                            field.onChange(value);
+                            form.setValue("subCategory", "");
+                          }}
+                        >
+                          <SelectTrigger className="focus:scale-105 transition-transform duration-200">
+                            <SelectValue placeholder="Select Category" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {Object.keys(categories).map((category) => (
+                              <SelectItem key={category} value={category}>
+                                {category}
                               </SelectItem>
                             ))}
-                        </SelectContent>
-                      </Select>
-                      <FormMessage />
-                    </FormItem>
+                          </SelectContent>
+                        </Select>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </FormStepWrapper>
+                <FormStepWrapper show={step === 3} key="step-3">
+                  <h2 className="text-xl font-semibold mb-4">Select Sub-Category</h2>
+                  <FormField
+                    control={form.control}
+                    name="subCategory"
+                    render={({ field }) => (
+                      <FormItem>
+                        <Select
+                          value={field.value}
+                          onValueChange={field.onChange}
+                          disabled={!form.getValues("category")}
+                        >
+                          <SelectTrigger className="focus:scale-105 transition-transform duration-200">
+                            <SelectValue placeholder="Select Sub-Category" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {form.getValues("category") &&
+                              categories[form.getValues("category") as keyof typeof categories]?.map((sub) => (
+                                <SelectItem key={sub} value={sub}>
+                                  {sub}
+                                </SelectItem>
+                              ))}
+                          </SelectContent>
+                        </Select>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </FormStepWrapper>
+                <FormStepWrapper show={step === 4} key="step-4">
+                  <h2 className="text-xl font-semibold mb-4">Description (Optional)</h2>
+                  <FormField
+                    control={form.control}
+                    name="description"
+                    render={({ field }) => (
+                      <FormItem>
+                        <Input
+                          placeholder="Enter description..."
+                          className="focus:scale-105 transition-transform duration-200"
+                          {...field}
+                        />
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </FormStepWrapper>
+                <FormStepWrapper show={step === 5} key="step-5">
+                  <h2 className="text-xl font-semibold mb-4">Enter Amount (CAD)</h2>
+                  <FormField
+                    control={form.control}
+                    name="amount"
+                    render={({ field }) => (
+                      <FormItem>
+                        <Input
+                          type="number"
+                          step="0.01"
+                          placeholder="0.00"
+                          className="focus:scale-105 transition-transform duration-200"
+                          {...field}
+                        />
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </FormStepWrapper>
+                <FormStepWrapper show={step === 6} key="step-6">
+                  <h2 className="text-xl font-semibold mb-4">Select Date</h2>
+                  <FormField
+                    control={form.control}
+                    name="date"
+                    render={({ field }) => (
+                      <FormItem>
+                        <Popover>
+                          <PopoverTrigger asChild>
+                            <Button
+                              variant={"outline"}
+                              className={cn(
+                                "w-full justify-start text-left font-normal focus:scale-105 transition-transform duration-200",
+                                !field.value && "text-muted-foreground"
+                              )}
+                            >
+                              <CalendarIcon className="mr-2 h-4 w-4" />
+                              {field.value ? format(field.value, "PPP") : <span>Pick a date</span>}
+                            </Button>
+                          </PopoverTrigger>
+                          <PopoverContent className="w-auto p-0" align="start">
+                            <Calendar
+                              mode="single"
+                              selected={field.value}
+                              onSelect={field.onChange}
+                              initialFocus
+                              fromYear={2020}
+                              toYear={2025}
+                              className="rounded-md border"
+                              classNames={{
+                                caption: "flex justify-center pt-1 relative items-center",
+                                caption_label: "hidden",
+                                nav: "space-x-1 flex items-center",
+                                nav_button: "h-7 w-7 bg-transparent p-0 opacity-50 hover:opacity-100",
+                                dropdown: "p-2",
+                                dropdown_month: "text-sm font-medium",
+                                dropdown_year: "text-sm font-medium ml-2"
+                              }}
+                              captionLayout="dropdown"
+                            />
+                          </PopoverContent>
+                        </Popover>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </FormStepWrapper>
+                <FormStepWrapper show={step === 7} key="step-7">
+                  <h2 className="text-xl font-semibold mb-4">Upload Receipt</h2>
+                  <div className="flex gap-4">
+                    <Button
+                      type="button"
+                      variant="outline"
+                      className="flex-1 bg-[#D8E2C6] hover:bg-[#c8d2b6] text-foreground hover:scale-[1.02] transition-all duration-200"
+                      onClick={() => document.getElementById('receipt-upload')?.click()}
+                    >
+                      <PaperclipIcon className="h-4 w-4 mr-2" />
+                      Upload File
+                    </Button>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      className="flex-1 bg-[#D8E2C6] hover:bg-[#c8d2b6] text-foreground hover:scale-[1.02] transition-all duration-200"
+                      onClick={handleCameraCapture}
+                    >
+                      <Camera className="h-4 w-4 mr-2" />
+                      Take Photo
+                    </Button>
+                  </div>
+                  <input
+                    id="receipt-upload"
+                    type="file"
+                    accept="image/*"
+                    className="hidden"
+                    onChange={handleFileUpload}
+                    capture="environment"
+                  />
+                  {file && (
+                    <p className="mt-2 text-sm text-muted-foreground">
+                      Selected: {file.name}
+                    </p>
                   )}
-                />
-              </FormStepWrapper>
-              <FormStepWrapper show={step === 4}>
-                <h2 className="text-xl font-semibold mb-4">Description (Optional)</h2>
-                <FormField
-                  control={form.control}
-                  name="description"
-                  render={({ field }) => (
-                    <FormItem>
-                      <Input
-                        placeholder="Enter description..."
-                        className="focus:scale-105 transition-transform duration-200"
-                        {...field}
-                      />
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </FormStepWrapper>
-              <FormStepWrapper show={step === 5}>
-                <h2 className="text-xl font-semibold mb-4">Enter Amount (CAD)</h2>
-                <FormField
-                  control={form.control}
-                  name="amount"
-                  render={({ field }) => (
-                    <FormItem>
-                      <Input
-                        type="number"
-                        step="0.01"
-                        placeholder="0.00"
-                        className="focus:scale-105 transition-transform duration-200"
-                        {...field}
-                      />
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </FormStepWrapper>
-              <FormStepWrapper show={step === 6}>
-                <h2 className="text-xl font-semibold mb-4">Select Date</h2>
-                <FormField
-                  control={form.control}
-                  name="date"
-                  render={({ field }) => (
-                    <FormItem>
-                      <Popover>
-                        <PopoverTrigger asChild>
-                          <Button
-                            variant={"outline"}
-                            className={cn(
-                              "w-full justify-start text-left font-normal focus:scale-105 transition-transform duration-200",
-                              !field.value && "text-muted-foreground"
-                            )}
-                          >
-                            <CalendarIcon className="mr-2 h-4 w-4" />
-                            {field.value ? format(field.value, "PPP") : <span>Pick a date</span>}
-                          </Button>
-                        </PopoverTrigger>
-                        <PopoverContent className="w-auto p-0" align="start">
-                          <Calendar
-                            mode="single"
-                            selected={field.value}
-                            onSelect={field.onChange}
-                            initialFocus
-                            fromYear={2020}
-                            toYear={2025}
-                            className="rounded-md border"
-                            classNames={{
-                              caption: "flex justify-center pt-1 relative items-center",
-                              caption_label: "hidden",
-                              nav: "space-x-1 flex items-center",
-                              nav_button: "h-7 w-7 bg-transparent p-0 opacity-50 hover:opacity-100",
-                              dropdown: "p-2",
-                              dropdown_month: "text-sm font-medium",
-                              dropdown_year: "text-sm font-medium ml-2"
-                            }}
-                            captionLayout="dropdown"
-                          />
-                        </PopoverContent>
-                      </Popover>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </FormStepWrapper>
-              <FormStepWrapper show={step === 7}>
-                <h2 className="text-xl font-semibold mb-4">Upload Receipt</h2>
-                <div className="flex gap-4">
-                  <Button
-                    type="button"
-                    variant="outline"
-                    className="flex-1 bg-[#D8E2C6] hover:bg-[#c8d2b6] text-foreground hover:scale-[1.02] transition-all duration-200"
-                    onClick={() => document.getElementById('receipt-upload')?.click()}
-                  >
-                    <PaperclipIcon className="h-4 w-4 mr-2" />
-                    Upload File
-                  </Button>
-                  <Button
-                    type="button"
-                    variant="outline"
-                    className="flex-1 bg-[#D8E2C6] hover:bg-[#c8d2b6] text-foreground hover:scale-[1.02] transition-all duration-200"
-                    onClick={handleCameraCapture}
-                  >
-                    <Camera className="h-4 w-4 mr-2" />
-                    Take Photo
-                  </Button>
-                </div>
-                <input
-                  id="receipt-upload"
-                  type="file"
-                  accept="image/*"
-                  className="hidden"
-                  onChange={handleFileUpload}
-                  capture="environment"
-                />
-                {file && (
-                  <p className="mt-2 text-sm text-muted-foreground">
-                    Selected: {file.name}
-                  </p>
-                )}
-              </FormStepWrapper>
+                </FormStepWrapper>
+              </div>
               <div className="flex justify-between pt-4">
                 {step > 1 && (
                   <Button
