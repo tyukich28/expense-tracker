@@ -68,20 +68,21 @@ export default function ExpenseForm() {
   };
 
   const canProceed = () => {
+    const values = form.getValues();
     switch (step) {
       case 1:
-        return !!form.getValues("user");
+        return !!values.user;
       case 2:
-        return !!form.getValues("category");
+        return !!values.category;
       case 3:
-        return !!form.getValues("subCategory");
+        return !!values.subCategory;
       case 4:
         return true; // Optional step
       case 5:
-        const amount = form.getValues("amount");
+        const amount = values.amount;
         return !!amount && !isNaN(parseFloat(amount));
       case 6:
-        return !!form.getValues("date");
+        return !!values.date;
       case 7:
         return true; // Optional step
       default:
@@ -118,10 +119,9 @@ export default function ExpenseForm() {
     }
   };
 
-  const generateYearOptions = () => {
-    const currentYear = new Date().getFullYear();
-    return Array.from({ length: 6 }, (_, i) => currentYear - i);
-  };
+  const currentDate = form.getValues("date") || new Date();
+  const currentYear = currentDate.getFullYear();
+  const currentMonth = currentDate.getMonth() + 1;
 
   return (
     <div className="min-h-screen bg-[#B9DCA9] bg-gradient-to-br from-[#B9DCA9] to-[#F7F8F5] p-4">
@@ -259,70 +259,79 @@ export default function ExpenseForm() {
 
               <FormStepWrapper show={step === 6}>
                 <h2 className="text-xl font-semibold mb-4">Select Date</h2>
-                <Popover>
-                  <PopoverTrigger asChild>
-                    <Button
-                      variant={"outline"}
-                      className={cn(
-                        "w-full justify-start text-left font-normal focus:scale-105 transition-transform",
-                        !form.getValues("date") && "text-muted-foreground"
-                      )}
-                    >
-                      <CalendarIcon className="mr-2 h-4 w-4" />
-                      {form.getValues("date") ? format(form.getValues("date"), "PPP") : <span>Pick a date</span>}
-                    </Button>
-                  </PopoverTrigger>
-                  <PopoverContent className="w-auto p-0" align="start">
-                    <div className="p-3 border-b">
-                      <div className="flex justify-between items-center gap-2">
-                        <Select
-                          value={form.getValues("date")?.getFullYear().toString()}
-                          onValueChange={(year) => {
-                            const newDate = new Date(form.getValues("date"));
-                            newDate.setFullYear(parseInt(year));
-                            form.setValue("date", newDate, { shouldValidate: true });
-                          }}
-                        >
-                          <SelectTrigger className="w-[120px]">
-                            <SelectValue />
-                          </SelectTrigger>
-                          <SelectContent>
-                            {generateYearOptions().map((year) => (
-                              <SelectItem key={year} value={year.toString()}>
-                                {year}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                        <Select
-                          value={(form.getValues("date")?.getMonth() + 1).toString()}
-                          onValueChange={(month) => {
-                            const newDate = new Date(form.getValues("date"));
-                            newDate.setMonth(parseInt(month) - 1);
-                            form.setValue("date", newDate, { shouldValidate: true });
-                          }}
-                        >
-                          <SelectTrigger className="w-[120px]">
-                            <SelectValue />
-                          </SelectTrigger>
-                          <SelectContent>
-                            {Array.from({ length: 12 }, (_, i) => i + 1).map((month) => (
-                              <SelectItem key={month} value={month.toString()}>
-                                {new Date(0, month - 1).toLocaleString('default', { month: 'long' })}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                      </div>
-                    </div>
-                    <Calendar
-                      mode="single"
-                      selected={form.getValues("date")}
-                      onSelect={(date) => form.setValue("date", date!, { shouldValidate: true })}
-                      initialFocus
-                    />
-                  </PopoverContent>
-                </Popover>
+                <FormField
+                  control={form.control}
+                  name="date"
+                  render={({ field }) => (
+                    <FormItem>
+                      <Popover>
+                        <PopoverTrigger asChild>
+                          <Button
+                            variant={"outline"}
+                            className={cn(
+                              "w-full justify-start text-left font-normal focus:scale-105 transition-transform",
+                              !field.value && "text-muted-foreground"
+                            )}
+                          >
+                            <CalendarIcon className="mr-2 h-4 w-4" />
+                            {field.value ? format(field.value, "PPP") : <span>Pick a date</span>}
+                          </Button>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-auto p-0" align="start">
+                          <div className="p-3 border-b">
+                            <div className="flex justify-between items-center gap-2">
+                              <Select
+                                value={currentYear.toString()}
+                                onValueChange={(year) => {
+                                  const newDate = new Date(field.value);
+                                  newDate.setFullYear(parseInt(year));
+                                  form.setValue("date", newDate, { shouldValidate: true });
+                                }}
+                              >
+                                <SelectTrigger className="w-[120px]">
+                                  <SelectValue />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  {Array.from({ length: 6 }, (_, i) => currentYear - i).map((year) => (
+                                    <SelectItem key={year} value={year.toString()}>
+                                      {year}
+                                    </SelectItem>
+                                  ))}
+                                </SelectContent>
+                              </Select>
+                              <Select
+                                value={currentMonth.toString()}
+                                onValueChange={(month) => {
+                                  const newDate = new Date(field.value);
+                                  newDate.setMonth(parseInt(month) - 1);
+                                  form.setValue("date", newDate, { shouldValidate: true });
+                                }}
+                              >
+                                <SelectTrigger className="w-[120px]">
+                                  <SelectValue />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  {Array.from({ length: 12 }, (_, i) => i + 1).map((month) => (
+                                    <SelectItem key={month} value={month.toString()}>
+                                      {new Date(0, month - 1).toLocaleString('default', { month: 'long' })}
+                                    </SelectItem>
+                                  ))}
+                                </SelectContent>
+                              </Select>
+                            </div>
+                          </div>
+                          <Calendar
+                            mode="single"
+                            selected={field.value}
+                            onSelect={(date) => form.setValue("date", date!, { shouldValidate: true })}
+                            initialFocus
+                          />
+                        </PopoverContent>
+                      </Popover>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
               </FormStepWrapper>
 
               <FormStepWrapper show={step === 7}>
