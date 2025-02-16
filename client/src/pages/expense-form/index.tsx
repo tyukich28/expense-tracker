@@ -344,11 +344,16 @@ export default function ExpenseForm() {
                             fromYear={2020}
                             toYear={2025}
                             className="rounded-md border"
-                            ISOWeek
-                            showOutsideDays={false}
-                            formatters={{
-                              formatCaption: () => "",
+                            classNames={{
+                              caption: "flex justify-center pt-1 relative items-center",
+                              caption_label: "hidden",
+                              nav: "space-x-1 flex items-center",
+                              nav_button: "h-7 w-7 bg-transparent p-0 opacity-50 hover:opacity-100",
+                              dropdown: "p-2",
+                              dropdown_month: "text-sm font-medium",
+                              dropdown_year: "text-sm font-medium ml-2"
                             }}
+                            captionLayout="dropdown"
                           />
                         </PopoverContent>
                       </Popover>
