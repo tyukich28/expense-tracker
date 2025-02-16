@@ -167,12 +167,12 @@ export default function ExpenseForm() {
                       control={form.control}
                       name="user"
                       render={({ field }) => (
-                        <FormItem className="space-y-3">
+                        <FormItem className="space-y-3 relative z-50">
                           <Select
                             defaultValue={field.value}
                             onValueChange={field.onChange}
                           >
-                            <SelectTrigger className="h-12 text-lg">
+                            <SelectTrigger className="h-12 text-lg relative z-50">
                               <SelectValue placeholder="Select User" />
                             </SelectTrigger>
                             <SelectContent>
