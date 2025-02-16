@@ -100,7 +100,7 @@ export default function ExpenseForm() {
 
               <FormStepWrapper show={step === 1}>
                 <h2 className="text-2xl font-bold mb-4">Expense Tracker</h2>
-                <p className="text-gray-600 mb-6">Let's build healthy habits.</p>
+                <p className="text-gray-600 mb-6">Way to go! Let's build some healthy financial habits 💪🏼</p>
                 <Select
                   name="user"
                   onValueChange={(value) => form.setValue("user", value)}
@@ -116,7 +116,7 @@ export default function ExpenseForm() {
               </FormStepWrapper>
 
               <FormStepWrapper show={step === 2}>
-                <h2 className="text-xl font-semibold mb-4">Select Category</h2>
+                <h2 className="text-xl font-semibold mb-4">Select an Expense Category:</h2>
                 <Select
                   name="category"
                   onValueChange={(value) => {
@@ -160,7 +160,7 @@ export default function ExpenseForm() {
 
               <FormStepWrapper show={step === 4}>
                 <h2 className="text-xl font-semibold mb-4">
-                  {form.watch("category") === "Misc (please describe)" 
+                  {form.watch("category") === "Misc (please describe)"
                     ? "If you chose \"Misc Category\", please describe the expense category"
                     : "Description (Optional)"}
                 </h2>
@@ -292,16 +292,16 @@ export default function ExpenseForm() {
                   </Button>
                 )}
                 {step < 7 ? (
-                  <Button 
-                    type="button" 
-                    onClick={nextStep} 
+                  <Button
+                    type="button"
+                    onClick={nextStep}
                     className="ml-auto bg-[#B9DCA9] hover:bg-[#a8cb98] text-foreground"
                   >
                     Next
                   </Button>
                 ) : (
-                  <Button 
-                    type="submit" 
+                  <Button
+                    type="submit"
                     className="ml-auto bg-[#B9DCA9] hover:bg-[#a8cb98] text-foreground"
                   >
                     Submit
