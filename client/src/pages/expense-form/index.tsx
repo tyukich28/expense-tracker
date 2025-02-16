@@ -44,7 +44,7 @@ export default function ExpenseForm() {
   const form = useForm({
     resolver: zodResolver(insertExpenseSchema),
     defaultValues,
-    mode: "onChange",
+    mode: "onSubmit", // Change from onChange to onSubmit
   });
 
   // Debug form state
@@ -189,13 +189,16 @@ export default function ExpenseForm() {
       <Card className="max-w-lg mx-auto bg-[#F0E5D4] rounded-2xl shadow-[0px_10px_30px_rgba(0,0,0,0.05)]">
         <CardContent className="p-8">
           <Form {...form}>
-            <form onSubmit={form.handleSubmit((data) => {
-              console.log('Form submitted:', data);
-              // Only mutate when the form is actually submitted
-              if (step === 7) {
-                mutate(data);
-              }
-            })} className="space-y-6">
+            <form 
+              onSubmit={form.handleSubmit((data) => {
+                // Only submit when the submit button is clicked
+                if (step === 7) {
+                  console.log('Form submitted:', data);
+                  mutate(data);
+                }
+              })} 
+              className="space-y-6"
+            >
               <ProgressBar currentStep={step} totalSteps={7} />
 
               <FormStepWrapper show={step === 1}>
