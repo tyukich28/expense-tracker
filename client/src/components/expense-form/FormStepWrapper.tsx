@@ -7,7 +7,7 @@ interface FormStepWrapperProps {
 
 export default function FormStepWrapper({ children, show }: FormStepWrapperProps) {
   return (
-    <div className="min-h-[200px] relative">
+    <div className="relative h-full">
       <AnimatePresence mode="wait" initial={false}>
         {show && (
           <motion.div
