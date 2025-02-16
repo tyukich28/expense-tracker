@@ -20,6 +20,9 @@ export async function registerRoutes(app: Express) {
 
   app.post("/api/expenses", upload.single('receipt'), async (req, res) => {
     try {
+      console.log("Received expense data:", req.body);
+      console.log("File data:", req.file);
+
       // Parse and validate the incoming data
       const expenseData = {
         ...req.body,
@@ -29,10 +32,14 @@ export async function registerRoutes(app: Express) {
         receiptUrl: req.file ? `/uploads/${req.file.filename}` : undefined
       };
 
+      console.log("Parsed expense data:", expenseData);
+
       const expense = insertExpenseSchema.parse(expenseData);
+      console.log("Validated expense data:", expense);
 
       // Save to local storage
       const created = await storage.createExpense(expense);
+      console.log("Saved to local storage:", created);
 
       // Save to Notion
       try {
@@ -41,16 +48,21 @@ export async function registerRoutes(app: Express) {
           ...expense,
           date: expense.date.toISOString().split('T')[0]
         };
-        await addExpenseToNotion(notionExpense);
+        console.log("Attempting to save to Notion:", notionExpense);
+        const notionResponse = await addExpenseToNotion(notionExpense);
+        console.log("Notion response:", notionResponse);
       } catch (notionError) {
-        console.error("Failed to save to Notion:", notionError);
+        console.error("Detailed Notion error:", notionError);
         // Continue with response even if Notion save fails
       }
 
       res.json(created);
     } catch (error) {
-      console.error("Error saving expense:", error);
-      res.status(400).json({ error: "Invalid expense data" });
+      console.error("Detailed error in expense creation:", error);
+      res.status(400).json({ 
+        error: "Invalid expense data",
+        details: error instanceof Error ? error.message : "Unknown error"
+      });
     }
   });
 

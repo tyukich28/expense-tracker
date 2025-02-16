@@ -17,6 +17,22 @@ export interface NotionExpense {
 
 export async function addExpenseToNotion(expense: NotionExpense) {
   try {
+    console.log("Creating Notion page with expense:", expense);
+
+    // Prepare the receipt files array
+    let files = [];
+    if (expense.receiptUrl) {
+      // Create an external URL for the receipt
+      const fullUrl = `${process.env.REPL_SLUG}.${process.env.REPL_OWNER}.repl.co${expense.receiptUrl}`;
+      files = [{
+        name: "Receipt",
+        type: "external",
+        external: {
+          url: `https://${fullUrl}`
+        }
+      }];
+    }
+
     const response = await notion.pages.create({
       parent: {
         database_id: process.env.NOTION_DATABASE_ID!,
@@ -63,7 +79,7 @@ export async function addExpenseToNotion(expense: NotionExpense) {
         },
         Receipt: {
           type: "files",
-          files: []  // Initialize as empty array since we're not uploading files directly to Notion
+          files: files
         },
         Notes: {
           type: "rich_text",
@@ -79,9 +95,10 @@ export async function addExpenseToNotion(expense: NotionExpense) {
       },
     });
 
+    console.log("Notion page created successfully:", response);
     return response;
   } catch (error) {
-    console.error("Failed to add expense to Notion:", error);
+    console.error("Detailed error adding expense to Notion:", error);
     throw new Error("Failed to save expense to Notion");
   }
 }
