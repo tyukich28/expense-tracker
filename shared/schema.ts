@@ -31,10 +31,9 @@ export const categorySchema = z.object({
   Transportation: z.array(z.string()),
   Gifts: z.array(z.string()),
   "Fun + Entertainment": z.array(z.string()),
-  Subscriptions: z.array(z.string()),
   "Personal Care": z.array(z.string()),
   "Health & Fitness": z.array(z.string()),
-  "Food & Beverage": z.array(z.string()),
+  "Food & Bev": z.array(z.string()),
   "Rental Property": z.array(z.string()),
   Home: z.array(z.string()),
   Yoshi: z.array(z.string()),
@@ -43,43 +42,13 @@ export const categorySchema = z.object({
 export type Categories = z.infer<typeof categorySchema>;
 
 export const categories: Categories = {
-  Transportation: ["Presto", "Uber", "Car Insurance", "Gas", "Parking"],
+  Transportation: ["Presto", "Uber", "Gas", "Parking"],
   Gifts: ["Gifts_Friends-Family"],
   "Fun + Entertainment": ["Activities"],
-  Subscriptions: [
-    "Spotify",
-    "YouTube Premium",
-    "ChatGPT",
-    "Perplexity",
-    "Telus_Netflix/Disney+",
-    "Amazon Prime",
-    "Notion",
-    "Clay",
-    "Quickbooks",
-    "iCloud_Lex",
-    "iCloud_Ty",
-    "Affirm_Lex-Laptop",
-    "Affirm_Ty-Laptop",
-    "Affirm_Ty-Laptop-Applecare",
-    "Affirm_Samsung-Frame"
-  ],
   "Personal Care": ["Haircuts_Tyler", "Nails_Alexa", "Dry Cleaning"],
-  "Health & Fitness": ["Vitamins & Supplements", "Gym Membership_Tyler"],
-  "Food & Beverage": ["Groceries", "LCBO", "Coffee", "Uber Eats + Eating Out"],
-  "Rental Property": [
-    "Mortgage_320-Richmond",
-    "Condo Fees_320-Richmond",
-    "Mortgage_32-Trolley",
-    "Condo Fees_32-Trolley",
-    "Maintenance & Repairs"
-  ],
-  Home: [
-    "Utilities - Hydro",
-    "Cleaner",
-    "Rent",
-    "Utilities - Internet",
-    "Cellphones",
-    "Cleaning Supplies"
-  ],
-  Yoshi: ["Pet Insurance", "Pet Food", "Dog Walker", "Dog Toys", "Vet Bill"]
+  "Health & Fitness": ["Vitamins & Supplements"],
+  "Food & Bev": ["Groceries", "LCBO", "Coffee", "Uber Eats + Eating Out"],
+  "Rental Property": ["Maintenance & Repairs"],
+  Home: ["Cleaner", "Cleaning Supplies"],
+  Yoshi: ["Pet Food", "Dog Walker", "Dog Toys", "Vet Bill"]
 };
