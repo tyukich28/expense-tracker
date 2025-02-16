@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Card, CardContent } from "@/components/ui/card";
@@ -18,7 +18,6 @@ import { insertExpenseSchema, categories } from "@shared/schema";
 import FormStepWrapper from "@/components/expense-form/FormStepWrapper";
 import ProgressBar from "@/components/expense-form/ProgressBar";
 
-// Define default values outside component to prevent recreation
 const defaultValues = {
   user: "",
   category: "",
@@ -159,15 +158,13 @@ export default function ExpenseForm() {
               onSubmit={(e) => {
                 e.preventDefault();
                 if (step === 7) {
-                  form.handleSubmit((data) => {
-                    console.log('Form submitted:', data);
-                    mutate(data);
-                  })(e);
+                  form.handleSubmit((data) => mutate(data))(e);
                 }
               }}
               className="space-y-6"
             >
               <ProgressBar currentStep={step} totalSteps={7} />
+
               <FormStepWrapper show={step === 1}>
                 <h2 className="text-2xl font-bold mb-4">Expense Tracker</h2>
                 <p className="text-gray-600 mb-6">Let's track your expenses!</p>
@@ -177,8 +174,10 @@ export default function ExpenseForm() {
                   render={({ field }) => (
                     <FormItem>
                       <Select
-                        value={field.value}
-                        onValueChange={field.onChange}
+                        defaultValue={field.value}
+                        onValueChange={(value) => {
+                          field.onChange(value);
+                        }}
                       >
                         <SelectTrigger className="focus:scale-105 transition-transform duration-200">
                           <SelectValue placeholder="Select User" />
