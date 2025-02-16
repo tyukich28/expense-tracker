@@ -22,7 +22,8 @@ import ProgressBar from "@/components/expense-form/ProgressBar";
 export default function ExpenseForm() {
   const [step, setStep] = useState(1);
   const { toast } = useToast();
-  
+  const [file, setFile] = useState<File | null>(null);
+
   const form = useForm({
     resolver: zodResolver(insertExpenseSchema),
     defaultValues: {
@@ -39,6 +40,12 @@ export default function ExpenseForm() {
 
   const { mutate } = useMutation({
     mutationFn: async (data: any) => {
+      // Handle file upload if a file is selected
+      if (file) {
+        // In a real app, we would upload the file to a storage service
+        // and get back a URL to store in the database
+        data.receiptUrl = URL.createObjectURL(file);
+      }
       const res = await apiRequest("POST", "/api/expenses", data);
       return res.json();
     },
@@ -48,6 +55,7 @@ export default function ExpenseForm() {
         description: "Expense saved successfully",
       });
       form.reset();
+      setFile(null);
       setStep(1);
     },
     onError: () => {
@@ -66,6 +74,28 @@ export default function ExpenseForm() {
   const nextStep = () => setStep((s) => Math.min(s + 1, 7));
   const prevStep = () => setStep((s) => Math.max(s - 1, 1));
 
+  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      setFile(e.target.files[0]);
+    }
+  };
+
+  const handleCameraCapture = async () => {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+      // In a real app, we would handle capturing the photo here
+      // For now, we'll just stop the stream
+      stream.getTracks().forEach(track => track.stop());
+    } catch (err) {
+      console.error('Error accessing camera:', err);
+    }
+  };
+
+  const generateYearOptions = () => {
+    const currentYear = new Date().getFullYear();
+    return Array.from({ length: 6 }, (_, i) => currentYear - i);
+  };
+
   return (
     <div className="min-h-screen bg-[#D8E2C6] bg-gradient-to-br from-[#D8E2C6] to-[#F7F8F5] p-4">
       <Card className="max-w-lg mx-auto bg-[#F7F8F5]">
@@ -73,7 +103,7 @@ export default function ExpenseForm() {
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
               <ProgressBar currentStep={step} totalSteps={7} />
-              
+
               <FormStepWrapper show={step === 1}>
                 <h2 className="text-2xl font-bold mb-4">Expense Tracker</h2>
                 <p className="text-gray-600 mb-6">Let's build healthy habits.</p>
@@ -95,7 +125,10 @@ export default function ExpenseForm() {
                 <h2 className="text-xl font-semibold mb-4">Select Category</h2>
                 <Select
                   name="category"
-                  onValueChange={(value) => form.setValue("category", value)}
+                  onValueChange={(value) => {
+                    form.setValue("category", value);
+                    form.setValue("subCategory", ""); // Reset sub-category when category changes
+                  }}
                 >
                   <SelectTrigger>
                     <SelectValue placeholder="Select Category" />
@@ -131,13 +164,15 @@ export default function ExpenseForm() {
                 </Select>
               </FormStepWrapper>
 
-              <FormStepWrapper
-                show={step === 4 && form.watch("category") === "Misc (please describe)"}
-              >
-                <h2 className="text-xl font-semibold mb-4">Description</h2>
-                <Textarea
-                  placeholder="Describe the expense..."
+              <FormStepWrapper show={step === 4}>
+                <h2 className="text-xl font-semibold mb-4">Miscellaneous Description</h2>
+                <Input
+                  type="text"
+                  placeholder="Enter description..."
                   {...form.register("description")}
+                  className={cn(
+                    form.watch("category") !== "Misc (please describe)" && "hidden"
+                  )}
                 />
               </FormStepWrapper>
 
@@ -166,7 +201,49 @@ export default function ExpenseForm() {
                       {form.watch("date") ? format(form.watch("date"), "PPP") : <span>Pick a date</span>}
                     </Button>
                   </PopoverTrigger>
-                  <PopoverContent className="w-auto p-0">
+                  <PopoverContent className="w-auto p-0" align="start">
+                    <div className="p-3 border-b">
+                      <div className="flex justify-between items-center gap-2">
+                        <Select
+                          value={form.watch("date")?.getFullYear().toString()}
+                          onValueChange={(year) => {
+                            const newDate = new Date(form.watch("date"));
+                            newDate.setFullYear(parseInt(year));
+                            form.setValue("date", newDate);
+                          }}
+                        >
+                          <SelectTrigger className="w-[120px]">
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {generateYearOptions().map((year) => (
+                              <SelectItem key={year} value={year.toString()}>
+                                {year}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                        <Select
+                          value={(form.watch("date")?.getMonth() + 1).toString()}
+                          onValueChange={(month) => {
+                            const newDate = new Date(form.watch("date"));
+                            newDate.setMonth(parseInt(month) - 1);
+                            form.setValue("date", newDate);
+                          }}
+                        >
+                          <SelectTrigger className="w-[120px]">
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {Array.from({ length: 12 }, (_, i) => i + 1).map((month) => (
+                              <SelectItem key={month} value={month.toString()}>
+                                {new Date(0, month - 1).toLocaleString('default', { month: 'long' })}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
+                    </div>
                     <Calendar
                       mode="single"
                       selected={form.watch("date")}
@@ -178,12 +255,37 @@ export default function ExpenseForm() {
               </FormStepWrapper>
 
               <FormStepWrapper show={step === 7}>
-                <h2 className="text-xl font-semibold mb-4">Upload Receipt (Optional)</h2>
-                <Input
-                  type="text"
-                  placeholder="Receipt URL"
-                  {...form.register("receiptUrl")}
+                <h2 className="text-xl font-semibold mb-4">Upload Receipt</h2>
+                <div className="flex gap-4">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    className="flex-1"
+                    onClick={() => document.getElementById('receipt-upload')?.click()}
+                  >
+                    Upload File
+                  </Button>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    className="flex-1"
+                    onClick={handleCameraCapture}
+                  >
+                    Take Photo
+                  </Button>
+                </div>
+                <input
+                  id="receipt-upload"
+                  type="file"
+                  accept="image/*"
+                  className="hidden"
+                  onChange={handleFileUpload}
                 />
+                {file && (
+                  <p className="mt-2 text-sm text-muted-foreground">
+                    Selected: {file.name}
+                  </p>
+                )}
                 <Textarea
                   placeholder="Additional notes..."
                   className="mt-4"
