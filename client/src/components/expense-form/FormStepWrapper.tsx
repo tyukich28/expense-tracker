@@ -20,7 +20,7 @@ export default function FormStepWrapper({ children, show }: FormStepWrapperProps
               opacity: { duration: 0.2 },
               x: { duration: 0.2 }
             }}
-            className="h-full flex flex-col"
+            className="h-full flex flex-col relative"
           >
             {children}
           </motion.div>

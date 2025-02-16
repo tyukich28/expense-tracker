@@ -147,7 +147,7 @@ export default function ExpenseForm() {
       <Card className="w-full max-w-xl aspect-[4/3] mx-auto bg-[#F0E5D4] rounded-2xl shadow-[0px_10px_30px_rgba(0,0,0,0.05)]">
         <CardContent className="p-6 h-full">
           <Form {...form}>
-            <form 
+            <form
               onSubmit={(e) => {
                 e.preventDefault();
                 if (step === 7) {
@@ -175,7 +175,7 @@ export default function ExpenseForm() {
                             <SelectTrigger className="h-12 text-lg relative z-50">
                               <SelectValue placeholder="Select User" />
                             </SelectTrigger>
-                            <SelectContent>
+                            <SelectContent className="z-50">
                               <SelectItem value="Tyler" className="text-lg">Tyler</SelectItem>
                               <SelectItem value="Alexa" className="text-lg">Alexa</SelectItem>
                             </SelectContent>
@@ -194,7 +194,7 @@ export default function ExpenseForm() {
                       control={form.control}
                       name="category"
                       render={({ field }) => (
-                        <FormItem className="space-y-3">
+                        <FormItem className="space-y-3 relative z-50">
                           <Select
                             value={field.value}
                             onValueChange={(value) => {
@@ -202,10 +202,10 @@ export default function ExpenseForm() {
                               form.setValue("subCategory", "");
                             }}
                           >
-                            <SelectTrigger className="h-12 text-lg">
+                            <SelectTrigger className="h-12 text-lg relative z-50">
                               <SelectValue placeholder="Select Category" />
                             </SelectTrigger>
-                            <SelectContent>
+                            <SelectContent className="z-50">
                               {Object.keys(categories).map((category) => (
                                 <SelectItem key={category} value={category} className="text-lg">
                                   {category}
@@ -227,16 +227,16 @@ export default function ExpenseForm() {
                       control={form.control}
                       name="subCategory"
                       render={({ field }) => (
-                        <FormItem className="space-y-3">
+                        <FormItem className="space-y-3 relative z-50">
                           <Select
                             value={field.value}
                             onValueChange={field.onChange}
                             disabled={!form.getValues("category")}
                           >
-                            <SelectTrigger className="h-12 text-lg">
+                            <SelectTrigger className="h-12 text-lg relative z-50">
                               <SelectValue placeholder="Select Sub-Category" />
                             </SelectTrigger>
-                            <SelectContent>
+                            <SelectContent className="z-50">
                               {form.getValues("category") &&
                                 categories[form.getValues("category") as keyof typeof categories]?.map((sub) => (
                                   <SelectItem key={sub} value={sub} className="text-lg">
