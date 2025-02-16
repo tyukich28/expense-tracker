@@ -36,37 +36,22 @@ export default function ExpenseForm() {
   const [file, setFile] = useState<File | null>(null);
   const [useCamera, setUseCamera] = useState(false);
 
-  // Debug state changes
-  useEffect(() => {
-    console.log('Step changed:', step);
-  }, [step]);
-
   const form = useForm({
     resolver: zodResolver(insertExpenseSchema),
     defaultValues,
-    mode: "onSubmit", // Change from onChange to onSubmit
+    mode: "onSubmit",
   });
-
-  // Debug form state
-  useEffect(() => {
-    const subscription = form.watch((value) => {
-      console.log('Form state updated:', value);
-    });
-    return () => subscription.unsubscribe();
-  }, [form]);
 
   const { mutate } = useMutation({
     mutationFn: async (data: any) => {
-      console.log('Submitting form data:', data);
       try {
-        // Format the data according to schema requirements
         const formattedData = {
           ...data,
-          date: data.date.toISOString().split('T')[0], // Format as YYYY-MM-DD
-          amount: data.amount.toString(), // Ensure amount is a string
-          description: data.description || "", // Ensure description is not undefined
-          notes: data.notes || "", // Ensure notes is not undefined
-          receiptUrl: data.receiptUrl || "" // Ensure receiptUrl is not undefined
+          date: data.date.toISOString().split('T')[0],
+          amount: data.amount.toString(),
+          description: data.description || "",
+          notes: data.notes || "",
+          receiptUrl: data.receiptUrl || ""
         };
 
         if (file) {
@@ -75,9 +60,7 @@ export default function ExpenseForm() {
 
         const res = await apiRequest("POST", "/api/expenses", formattedData);
         if (!res.ok) {
-          const errorData = await res.json();
-          console.error('Server response:', errorData);
-          throw new Error(errorData.error || 'Failed to save expense');
+          throw new Error('Failed to save expense');
         }
         return res.json();
       } catch (error) {
@@ -95,7 +78,6 @@ export default function ExpenseForm() {
       setStep(1);
     },
     onError: (error) => {
-      console.error('Form submission error:', error);
       toast({
         title: "Error",
         description: error instanceof Error ? error.message : "Failed to save expense",
@@ -106,8 +88,6 @@ export default function ExpenseForm() {
 
   const canProceed = () => {
     const values = form.getValues();
-    console.log('Checking form values for step', step, values);
-
     switch (step) {
       case 1:
         return !!values.user;
@@ -129,34 +109,22 @@ export default function ExpenseForm() {
   };
 
   const nextStep = () => {
-    try {
-      if (canProceed()) {
-        setStep((s) => Math.min(s + 1, 7));
-      } else {
-        toast({
-          title: "Required Field",
-          description: "Please fill in the required information before proceeding.",
-          variant: "destructive",
-        });
-      }
-    } catch (error) {
-      console.error('Error in nextStep:', error);
+    if (canProceed()) {
+      setStep((s) => Math.min(s + 1, 7));
+    } else {
+      toast({
+        title: "Required Field",
+        description: "Please fill in the required information before proceeding.",
+        variant: "destructive",
+      });
     }
   };
 
-  const prevStep = () => {
-    console.log('Moving to previous step from', step);
-    setStep((s) => Math.max(s - 1, 1));
-  };
+  const prevStep = () => setStep((s) => Math.max(s - 1, 1));
 
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    try {
-      if (e.target.files?.[0]) {
-        console.log('File selected:', e.target.files[0].name);
-        setFile(e.target.files[0]);
-      }
-    } catch (error) {
-      console.error('File upload error:', error);
+    if (e.target.files?.[0]) {
+      setFile(e.target.files[0]);
     }
   };
 
@@ -164,12 +132,10 @@ export default function ExpenseForm() {
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ video: true });
       setUseCamera(true);
-      // Create video element for preview
       const video = document.createElement('video');
       video.srcObject = stream;
       video.play();
 
-      // After capturing, stop the stream
       setTimeout(() => {
         stream.getTracks().forEach(track => track.stop());
         setUseCamera(false);
@@ -190,17 +156,18 @@ export default function ExpenseForm() {
         <CardContent className="p-8">
           <Form {...form}>
             <form 
-              onSubmit={form.handleSubmit((data) => {
-                // Only submit when the submit button is clicked
+              onSubmit={(e) => {
+                e.preventDefault();
                 if (step === 7) {
-                  console.log('Form submitted:', data);
-                  mutate(data);
+                  form.handleSubmit((data) => {
+                    console.log('Form submitted:', data);
+                    mutate(data);
+                  })(e);
                 }
-              })} 
+              }}
               className="space-y-6"
             >
               <ProgressBar currentStep={step} totalSteps={7} />
-
               <FormStepWrapper show={step === 1}>
                 <h2 className="text-2xl font-bold mb-4">Expense Tracker</h2>
                 <p className="text-gray-600 mb-6">Let's track your expenses!</p>
@@ -226,7 +193,6 @@ export default function ExpenseForm() {
                   )}
                 />
               </FormStepWrapper>
-
               <FormStepWrapper show={step === 2}>
                 <h2 className="text-xl font-semibold mb-4">Select Category</h2>
                 <FormField
@@ -257,7 +223,6 @@ export default function ExpenseForm() {
                   )}
                 />
               </FormStepWrapper>
-
               <FormStepWrapper show={step === 3}>
                 <h2 className="text-xl font-semibold mb-4">Select Sub-Category</h2>
                 <FormField
@@ -287,7 +252,6 @@ export default function ExpenseForm() {
                   )}
                 />
               </FormStepWrapper>
-
               <FormStepWrapper show={step === 4}>
                 <h2 className="text-xl font-semibold mb-4">Description (Optional)</h2>
                 <FormField
@@ -305,7 +269,6 @@ export default function ExpenseForm() {
                   )}
                 />
               </FormStepWrapper>
-
               <FormStepWrapper show={step === 5}>
                 <h2 className="text-xl font-semibold mb-4">Enter Amount (CAD)</h2>
                 <FormField
@@ -325,7 +288,6 @@ export default function ExpenseForm() {
                   )}
                 />
               </FormStepWrapper>
-
               <FormStepWrapper show={step === 6}>
                 <h2 className="text-xl font-semibold mb-4">Select Date</h2>
                 <FormField
@@ -373,7 +335,6 @@ export default function ExpenseForm() {
                   )}
                 />
               </FormStepWrapper>
-
               <FormStepWrapper show={step === 7}>
                 <h2 className="text-xl font-semibold mb-4">Upload Receipt</h2>
                 <div className="flex gap-4">
@@ -410,7 +371,6 @@ export default function ExpenseForm() {
                   </p>
                 )}
               </FormStepWrapper>
-
               <div className="flex justify-between pt-4">
                 {step > 1 && (
                   <Button
