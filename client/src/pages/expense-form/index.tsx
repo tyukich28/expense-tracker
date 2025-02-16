@@ -341,9 +341,10 @@ export default function ExpenseForm() {
                             selected={field.value}
                             onSelect={field.onChange}
                             initialFocus
-                            captionLayout="dropdown-buttons"
+                            captionLayout="dropdown"
                             fromYear={2020}
                             toYear={2025}
+                            className="rounded-md border"
                           />
                         </PopoverContent>
                       </Popover>
