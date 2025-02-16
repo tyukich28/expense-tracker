@@ -68,7 +68,7 @@ export default function ExpenseForm() {
   };
 
   const canProceed = () => {
-    const values = form.getValues();
+    const values = form.watch();
     switch (step) {
       case 1:
         return !!values.user;
@@ -119,13 +119,9 @@ export default function ExpenseForm() {
     }
   };
 
-  const currentDate = form.getValues("date") || new Date();
-  const currentYear = currentDate.getFullYear();
-  const currentMonth = currentDate.getMonth() + 1;
-
   return (
-    <div className="min-h-screen bg-[#B9DCA9] bg-gradient-to-br from-[#B9DCA9] to-[#F7F8F5] p-4">
-      <Card className="max-w-lg mx-auto bg-[#F7F8F5] rounded-2xl shadow-lg transform hover:scale-[1.02] transition-all duration-300">
+    <div className="min-h-screen bg-[#D8E2C6] bg-gradient-radial from-[#D8E2C6] to-[#F0E5D4] p-4">
+      <Card className="max-w-lg mx-auto bg-[#F0E5D4] rounded-2xl shadow-[0px_10px_30px_rgba(0,0,0,0.05)] transform hover:scale-[1.02] transition-all duration-300">
         <CardContent className="p-8">
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
@@ -143,7 +139,7 @@ export default function ExpenseForm() {
                         value={field.value}
                         onValueChange={field.onChange}
                       >
-                        <SelectTrigger className="focus:scale-105 transition-transform">
+                        <SelectTrigger className="focus:scale-105 transition-transform duration-200">
                           <SelectValue placeholder="Select User" />
                         </SelectTrigger>
                         <SelectContent>
@@ -171,7 +167,7 @@ export default function ExpenseForm() {
                           form.setValue("subCategory", "");
                         }}
                       >
-                        <SelectTrigger className="focus:scale-105 transition-transform">
+                        <SelectTrigger className="focus:scale-105 transition-transform duration-200">
                           <SelectValue placeholder="Select Category" />
                         </SelectTrigger>
                         <SelectContent>
@@ -198,14 +194,14 @@ export default function ExpenseForm() {
                       <Select
                         value={field.value}
                         onValueChange={field.onChange}
-                        disabled={!form.getValues("category")}
+                        disabled={!form.watch("category")}
                       >
-                        <SelectTrigger className="focus:scale-105 transition-transform">
+                        <SelectTrigger className="focus:scale-105 transition-transform duration-200">
                           <SelectValue placeholder="Select Sub-Category" />
                         </SelectTrigger>
                         <SelectContent>
-                          {form.getValues("category") &&
-                            categories[form.getValues("category") as keyof typeof categories]?.map((sub) => (
+                          {form.watch("category") &&
+                            categories[form.watch("category") as keyof typeof categories]?.map((sub) => (
                               <SelectItem key={sub} value={sub}>
                                 {sub}
                               </SelectItem>
@@ -228,7 +224,7 @@ export default function ExpenseForm() {
                       <Input
                         type="text"
                         placeholder="Enter description..."
-                        className="focus:scale-105 transition-transform"
+                        className="focus:scale-105 transition-transform duration-200"
                         {...field}
                       />
                       <FormMessage />
@@ -248,7 +244,7 @@ export default function ExpenseForm() {
                         type="number"
                         step="0.01"
                         placeholder="0.00"
-                        className="focus:scale-105 transition-transform"
+                        className="focus:scale-105 transition-transform duration-200"
                         {...field}
                       />
                       <FormMessage />
@@ -269,7 +265,7 @@ export default function ExpenseForm() {
                           <Button
                             variant={"outline"}
                             className={cn(
-                              "w-full justify-start text-left font-normal focus:scale-105 transition-transform",
+                              "w-full justify-start text-left font-normal focus:scale-105 transition-transform duration-200",
                               !field.value && "text-muted-foreground"
                             )}
                           >
@@ -278,52 +274,10 @@ export default function ExpenseForm() {
                           </Button>
                         </PopoverTrigger>
                         <PopoverContent className="w-auto p-0" align="start">
-                          <div className="p-3 border-b">
-                            <div className="flex justify-between items-center gap-2">
-                              <Select
-                                value={currentYear.toString()}
-                                onValueChange={(year) => {
-                                  const newDate = new Date(field.value);
-                                  newDate.setFullYear(parseInt(year));
-                                  form.setValue("date", newDate, { shouldValidate: true });
-                                }}
-                              >
-                                <SelectTrigger className="w-[120px]">
-                                  <SelectValue />
-                                </SelectTrigger>
-                                <SelectContent>
-                                  {Array.from({ length: 6 }, (_, i) => currentYear - i).map((year) => (
-                                    <SelectItem key={year} value={year.toString()}>
-                                      {year}
-                                    </SelectItem>
-                                  ))}
-                                </SelectContent>
-                              </Select>
-                              <Select
-                                value={currentMonth.toString()}
-                                onValueChange={(month) => {
-                                  const newDate = new Date(field.value);
-                                  newDate.setMonth(parseInt(month) - 1);
-                                  form.setValue("date", newDate, { shouldValidate: true });
-                                }}
-                              >
-                                <SelectTrigger className="w-[120px]">
-                                  <SelectValue />
-                                </SelectTrigger>
-                                <SelectContent>
-                                  {Array.from({ length: 12 }, (_, i) => i + 1).map((month) => (
-                                    <SelectItem key={month} value={month.toString()}>
-                                      {new Date(0, month - 1).toLocaleString('default', { month: 'long' })}
-                                    </SelectItem>
-                                  ))}
-                                </SelectContent>
-                              </Select>
-                            </div>
-                          </div>
                           <Calendar
                             mode="single"
                             selected={field.value}
-                            onSelect={(date) => form.setValue("date", date!, { shouldValidate: true })}
+                            onSelect={(date) => field.onChange(date)}
                             initialFocus
                           />
                         </PopoverContent>
@@ -340,7 +294,7 @@ export default function ExpenseForm() {
                   <Button
                     type="button"
                     variant="outline"
-                    className="flex-1 bg-[#B9DCA9] hover:bg-[#a8cb98] text-foreground hover:scale-[1.02] transition-all"
+                    className="flex-1 bg-[#D8E2C6] hover:bg-[#c8d2b6] text-foreground hover:scale-[1.02] transition-all duration-200"
                     onClick={() => document.getElementById('receipt-upload')?.click()}
                   >
                     <PaperclipIcon className="h-4 w-4 mr-2" />
@@ -349,7 +303,7 @@ export default function ExpenseForm() {
                   <Button
                     type="button"
                     variant="outline"
-                    className="flex-1 bg-[#B9DCA9] hover:bg-[#a8cb98] text-foreground hover:scale-[1.02] transition-all"
+                    className="flex-1 bg-[#D8E2C6] hover:bg-[#c8d2b6] text-foreground hover:scale-[1.02] transition-all duration-200"
                     onClick={handleCameraCapture}
                   >
                     <Camera className="h-4 w-4 mr-2" />
@@ -376,7 +330,7 @@ export default function ExpenseForm() {
                     type="button" 
                     variant="outline"
                     onClick={prevStep}
-                    className="hover:translate-y-[-1px] transition-transform"
+                    className="hover:translate-y-[-1px] transition-transform duration-200"
                   >
                     Previous
                   </Button>
@@ -385,14 +339,14 @@ export default function ExpenseForm() {
                   <Button
                     type="button"
                     onClick={nextStep}
-                    className="ml-auto bg-[#B9DCA9] hover:bg-[#a8cb98] text-foreground hover:translate-y-[-2px] hover:scale-[1.02] transition-all"
+                    className="ml-auto bg-[#D8E2C6] hover:bg-[#c8d2b6] text-foreground hover:translate-y-[-2px] hover:scale-[1.02] transition-all duration-200"
                   >
                     Next
                   </Button>
                 ) : (
                   <Button
                     type="submit"
-                    className="ml-auto bg-[#B9DCA9] hover:bg-[#a8cb98] text-foreground hover:translate-y-[-2px] hover:scale-[1.02] transition-all"
+                    className="ml-auto bg-[#D8E2C6] hover:bg-[#c8d2b6] text-foreground hover:translate-y-[-2px] hover:scale-[1.02] transition-all duration-200"
                   >
                     Submit
                   </Button>
