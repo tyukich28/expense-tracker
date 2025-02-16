@@ -20,10 +20,11 @@ export default function FormStepWrapper({ children, show }: FormStepWrapperProps
             y: -20,
           }}
           transition={{
-            type: "spring",
-            stiffness: 300,
-            damping: 30,
-            mass: 1,
+            duration: 0.4,
+            ease: "easeInOut",
+          }}
+          style={{
+            willChange: "opacity, transform"
           }}
           className="space-y-4"
         >
