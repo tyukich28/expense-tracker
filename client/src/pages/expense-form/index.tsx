@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Card, CardContent } from "@/components/ui/card";
@@ -23,6 +23,11 @@ export default function ExpenseForm() {
   const { toast } = useToast();
   const [file, setFile] = useState<File | null>(null);
 
+  // Debug logging for form state
+  useEffect(() => {
+    console.log('Current step:', step);
+  }, [step]);
+
   const form = useForm({
     resolver: zodResolver(insertExpenseSchema),
     defaultValues: {
@@ -37,13 +42,26 @@ export default function ExpenseForm() {
     },
   });
 
+  // Debug logging for form values
+  useEffect(() => {
+    const subscription = form.watch((value, { name, type }) => {
+      console.log('Form field changed:', { name, type, value });
+    });
+    return () => subscription.unsubscribe();
+  }, [form.watch]);
+
   const { mutate } = useMutation({
     mutationFn: async (data: any) => {
-      if (file) {
-        data.receiptUrl = URL.createObjectURL(file);
+      try {
+        if (file) {
+          data.receiptUrl = URL.createObjectURL(file);
+        }
+        const res = await apiRequest("POST", "/api/expenses", data);
+        return res.json();
+      } catch (error) {
+        console.error('Mutation error:', error);
+        throw error;
       }
-      const res = await apiRequest("POST", "/api/expenses", data);
-      return res.json();
     },
     onSuccess: () => {
       toast({
@@ -54,7 +72,8 @@ export default function ExpenseForm() {
       setFile(null);
       setStep(1);
     },
-    onError: () => {
+    onError: (error) => {
+      console.error('Mutation error:', error);
       toast({
         title: "Error",
         description: "Failed to save expense",
@@ -64,49 +83,67 @@ export default function ExpenseForm() {
   });
 
   const onSubmit = (data: any) => {
+    console.log('Form submission data:', data);
     mutate(data);
   };
 
   const canProceed = () => {
-    const values = form.watch();
-    switch (step) {
-      case 1:
-        return !!values.user;
-      case 2:
-        return !!values.category;
-      case 3:
-        return !!values.subCategory;
-      case 4:
-        return true; // Optional step
-      case 5:
-        const amount = values.amount;
-        return !!amount && !isNaN(parseFloat(amount));
-      case 6:
-        return !!values.date;
-      case 7:
-        return true; // Optional step
-      default:
-        return false;
+    try {
+      const values = form.watch();
+      console.log('Checking form values:', values);
+
+      switch (step) {
+        case 1:
+          return !!values.user;
+        case 2:
+          return !!values.category;
+        case 3:
+          return !!values.subCategory;
+        case 4:
+          return true; // Optional step
+        case 5:
+          const amount = values.amount;
+          const isValid = !!amount && !isNaN(parseFloat(amount));
+          console.log('Amount validation:', { amount, isValid });
+          return isValid;
+        case 6:
+          return !!values.date;
+        case 7:
+          return true; // Optional step
+        default:
+          return false;
+      }
+    } catch (error) {
+      console.error('Error in canProceed:', error);
+      return false;
     }
   };
 
   const nextStep = () => {
-    if (canProceed()) {
-      setStep((s) => Math.min(s + 1, 7));
-    } else {
-      toast({
-        title: "Required Field",
-        description: "Please fill in the required information before proceeding.",
-        variant: "destructive",
-      });
+    try {
+      if (canProceed()) {
+        setStep((s) => Math.min(s + 1, 7));
+      } else {
+        toast({
+          title: "Required Field",
+          description: "Please fill in the required information before proceeding.",
+          variant: "destructive",
+        });
+      }
+    } catch (error) {
+      console.error('Error in nextStep:', error);
     }
   };
 
   const prevStep = () => setStep((s) => Math.max(s - 1, 1));
 
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files[0]) {
-      setFile(e.target.files[0]);
+    try {
+      if (e.target.files && e.target.files[0]) {
+        setFile(e.target.files[0]);
+      }
+    } catch (error) {
+      console.error('Error in file upload:', error);
     }
   };
 
@@ -114,8 +151,8 @@ export default function ExpenseForm() {
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ video: true });
       stream.getTracks().forEach(track => track.stop());
-    } catch (err) {
-      console.error('Error accessing camera:', err);
+    } catch (error) {
+      console.error('Error accessing camera:', error);
     }
   };
 
