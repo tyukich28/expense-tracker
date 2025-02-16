@@ -143,9 +143,9 @@ export default function ExpenseForm() {
   };
 
   return (
-    <div className="min-h-screen bg-[#D8E2C6] bg-gradient-radial from-[#D8E2C6] to-[#F0E5D4] p-4 flex items-center justify-center">
-      <Card className="w-full max-w-lg mx-auto bg-[#F0E5D4] rounded-2xl shadow-[0px_10px_30px_rgba(0,0,0,0.05)]">
-        <CardContent className="p-8">
+    <div className="min-h-screen bg-[#D8E2C6] bg-gradient-radial from-[#D8E2C6] to-[#F0E5D4] p-8 flex items-center justify-center">
+      <Card className="w-full max-w-xl aspect-[4/3] mx-auto bg-[#F0E5D4] rounded-2xl shadow-[0px_10px_30px_rgba(0,0,0,0.05)] overflow-auto">
+        <CardContent className="p-6">
           <Form {...form}>
             <form 
               onSubmit={(e) => {
@@ -154,12 +154,12 @@ export default function ExpenseForm() {
                   form.handleSubmit((data) => mutate(data))(e);
                 }
               }}
-              className="space-y-6"
+              className="h-full flex flex-col space-y-4"
             >
               <ProgressBar currentStep={step} totalSteps={7} />
 
               <FormStepWrapper show={step === 1} key="step-1">
-                <div className="space-y-4">
+                <div className="space-y-3">
                   <h2 className="text-2xl font-bold">Expense Tracker</h2>
                   <p className="text-gray-600">Let's track your expenses!</p>
                   <FormField
@@ -375,7 +375,7 @@ export default function ExpenseForm() {
                   )}
                 </div>
               </FormStepWrapper>
-              <div className="flex justify-between pt-4">
+              <div className="flex justify-between mt-auto pt-4">
                 {step > 1 && (
                   <Button
                     type="button"
