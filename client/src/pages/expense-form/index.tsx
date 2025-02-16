@@ -259,10 +259,10 @@ export default function ExpenseForm() {
                       control={form.control}
                       name="description"
                       render={({ field }) => (
-                        <FormItem className="space-y-3">
+                        <FormItem className="space-y-3 relative z-40">
                           <Input
                             placeholder="Enter description..."
-                            className="h-12 text-lg focus:scale-105 transition-transform duration-200"
+                            className="h-12 text-lg focus:scale-105 transition-transform duration-200 relative z-40"
                             {...field}
                           />
                           <FormMessage className="text-base" />
@@ -279,12 +279,12 @@ export default function ExpenseForm() {
                       control={form.control}
                       name="amount"
                       render={({ field }) => (
-                        <FormItem className="space-y-3">
+                        <FormItem className="space-y-3 relative z-40">
                           <Input
                             type="number"
                             step="0.01"
                             placeholder="0.00"
-                            className="h-12 text-lg focus:scale-105 transition-transform duration-200"
+                            className="h-12 text-lg focus:scale-105 transition-transform duration-200 relative z-40"
                             {...field}
                           />
                           <FormMessage className="text-base" />
