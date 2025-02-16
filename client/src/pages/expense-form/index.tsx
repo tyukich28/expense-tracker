@@ -186,6 +186,7 @@ export default function ExpenseForm() {
                     />
                   </div>
                 </FormStepWrapper>
+
                 <FormStepWrapper show={step === 2} key="step-2">
                   <div className="space-y-4">
                     <h2 className="text-2xl font-semibold">Select Category</h2>
@@ -193,7 +194,7 @@ export default function ExpenseForm() {
                       control={form.control}
                       name="category"
                       render={({ field }) => (
-                        <FormItem>
+                        <FormItem className="space-y-3">
                           <Select
                             value={field.value}
                             onValueChange={(value) => {
@@ -218,6 +219,7 @@ export default function ExpenseForm() {
                     />
                   </div>
                 </FormStepWrapper>
+
                 <FormStepWrapper show={step === 3} key="step-3">
                   <div className="space-y-4">
                     <h2 className="text-2xl font-semibold">Select Sub-Category</h2>
@@ -225,7 +227,7 @@ export default function ExpenseForm() {
                       control={form.control}
                       name="subCategory"
                       render={({ field }) => (
-                        <FormItem>
+                        <FormItem className="space-y-3">
                           <Select
                             value={field.value}
                             onValueChange={field.onChange}
@@ -249,6 +251,7 @@ export default function ExpenseForm() {
                     />
                   </div>
                 </FormStepWrapper>
+
                 <FormStepWrapper show={step === 4} key="step-4">
                   <div className="space-y-4">
                     <h2 className="text-2xl font-semibold">Description (Optional)</h2>
@@ -256,7 +259,7 @@ export default function ExpenseForm() {
                       control={form.control}
                       name="description"
                       render={({ field }) => (
-                        <FormItem>
+                        <FormItem className="space-y-3">
                           <Input
                             placeholder="Enter description..."
                             className="h-12 text-lg focus:scale-105 transition-transform duration-200"
@@ -268,6 +271,7 @@ export default function ExpenseForm() {
                     />
                   </div>
                 </FormStepWrapper>
+
                 <FormStepWrapper show={step === 5} key="step-5">
                   <div className="space-y-4">
                     <h2 className="text-2xl font-semibold">Enter Amount (CAD)</h2>
@@ -275,7 +279,7 @@ export default function ExpenseForm() {
                       control={form.control}
                       name="amount"
                       render={({ field }) => (
-                        <FormItem>
+                        <FormItem className="space-y-3">
                           <Input
                             type="number"
                             step="0.01"
@@ -289,6 +293,7 @@ export default function ExpenseForm() {
                     />
                   </div>
                 </FormStepWrapper>
+
                 <FormStepWrapper show={step === 6} key="step-6">
                   <div className="space-y-4">
                     <h2 className="text-2xl font-semibold">Select Date</h2>
@@ -296,7 +301,7 @@ export default function ExpenseForm() {
                       control={form.control}
                       name="date"
                       render={({ field }) => (
-                        <FormItem>
+                        <FormItem className="space-y-3">
                           <Popover>
                             <PopoverTrigger asChild>
                               <Button
@@ -338,6 +343,7 @@ export default function ExpenseForm() {
                     />
                   </div>
                 </FormStepWrapper>
+
                 <FormStepWrapper show={step === 7} key="step-7">
                   <div className="space-y-4">
                     <h2 className="text-2xl font-semibold">Upload Receipt</h2>
