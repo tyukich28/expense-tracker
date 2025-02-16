@@ -143,8 +143,8 @@ export default function ExpenseForm() {
   };
 
   return (
-    <div className="min-h-screen bg-[#D8E2C6] bg-gradient-radial from-[#D8E2C6] to-[#F0E5D4] p-4">
-      <Card className="max-w-lg mx-auto bg-[#F0E5D4] rounded-2xl shadow-[0px_10px_30px_rgba(0,0,0,0.05)]">
+    <div className="min-h-screen bg-[#D8E2C6] bg-gradient-radial from-[#D8E2C6] to-[#F0E5D4] p-4 flex items-center justify-center">
+      <Card className="w-full max-w-lg mx-auto bg-[#F0E5D4] rounded-2xl shadow-[0px_10px_30px_rgba(0,0,0,0.05)]">
         <CardContent className="p-8">
           <Form {...form}>
             <form 
@@ -154,14 +154,14 @@ export default function ExpenseForm() {
                   form.handleSubmit((data) => mutate(data))(e);
                 }
               }}
-              className="space-y-6 relative min-h-[300px]"
+              className="space-y-6"
             >
               <ProgressBar currentStep={step} totalSteps={7} />
 
-              <div className="relative">
-                <FormStepWrapper show={step === 1} key="step-1">
-                  <h2 className="text-2xl font-bold mb-4">Expense Tracker</h2>
-                  <p className="text-gray-600 mb-6">Let's track your expenses!</p>
+              <FormStepWrapper show={step === 1} key="step-1">
+                <div className="space-y-4">
+                  <h2 className="text-2xl font-bold">Expense Tracker</h2>
+                  <p className="text-gray-600">Let's track your expenses!</p>
                   <FormField
                     control={form.control}
                     name="user"
@@ -183,9 +183,11 @@ export default function ExpenseForm() {
                       </FormItem>
                     )}
                   />
-                </FormStepWrapper>
-                <FormStepWrapper show={step === 2} key="step-2">
-                  <h2 className="text-xl font-semibold mb-4">Select Category</h2>
+                </div>
+              </FormStepWrapper>
+              <FormStepWrapper show={step === 2} key="step-2">
+                <div className="space-y-4">
+                  <h2 className="text-xl font-semibold">Select Category</h2>
                   <FormField
                     control={form.control}
                     name="category"
@@ -213,9 +215,11 @@ export default function ExpenseForm() {
                       </FormItem>
                     )}
                   />
-                </FormStepWrapper>
-                <FormStepWrapper show={step === 3} key="step-3">
-                  <h2 className="text-xl font-semibold mb-4">Select Sub-Category</h2>
+                </div>
+              </FormStepWrapper>
+              <FormStepWrapper show={step === 3} key="step-3">
+                <div className="space-y-4">
+                  <h2 className="text-xl font-semibold">Select Sub-Category</h2>
                   <FormField
                     control={form.control}
                     name="subCategory"
@@ -242,9 +246,11 @@ export default function ExpenseForm() {
                       </FormItem>
                     )}
                   />
-                </FormStepWrapper>
-                <FormStepWrapper show={step === 4} key="step-4">
-                  <h2 className="text-xl font-semibold mb-4">Description (Optional)</h2>
+                </div>
+              </FormStepWrapper>
+              <FormStepWrapper show={step === 4} key="step-4">
+                <div className="space-y-4">
+                  <h2 className="text-xl font-semibold">Description (Optional)</h2>
                   <FormField
                     control={form.control}
                     name="description"
@@ -259,9 +265,11 @@ export default function ExpenseForm() {
                       </FormItem>
                     )}
                   />
-                </FormStepWrapper>
-                <FormStepWrapper show={step === 5} key="step-5">
-                  <h2 className="text-xl font-semibold mb-4">Enter Amount (CAD)</h2>
+                </div>
+              </FormStepWrapper>
+              <FormStepWrapper show={step === 5} key="step-5">
+                <div className="space-y-4">
+                  <h2 className="text-xl font-semibold">Enter Amount (CAD)</h2>
                   <FormField
                     control={form.control}
                     name="amount"
@@ -278,9 +286,11 @@ export default function ExpenseForm() {
                       </FormItem>
                     )}
                   />
-                </FormStepWrapper>
-                <FormStepWrapper show={step === 6} key="step-6">
-                  <h2 className="text-xl font-semibold mb-4">Select Date</h2>
+                </div>
+              </FormStepWrapper>
+              <FormStepWrapper show={step === 6} key="step-6">
+                <div className="space-y-4">
+                  <h2 className="text-xl font-semibold">Select Date</h2>
                   <FormField
                     control={form.control}
                     name="date"
@@ -325,9 +335,11 @@ export default function ExpenseForm() {
                       </FormItem>
                     )}
                   />
-                </FormStepWrapper>
-                <FormStepWrapper show={step === 7} key="step-7">
-                  <h2 className="text-xl font-semibold mb-4">Upload Receipt</h2>
+                </div>
+              </FormStepWrapper>
+              <FormStepWrapper show={step === 7} key="step-7">
+                <div className="space-y-4">
+                  <h2 className="text-xl font-semibold">Upload Receipt</h2>
                   <div className="flex gap-4">
                     <Button
                       type="button"
@@ -361,8 +373,8 @@ export default function ExpenseForm() {
                       Selected: {file.name}
                     </p>
                   )}
-                </FormStepWrapper>
-              </div>
+                </div>
+              </FormStepWrapper>
               <div className="flex justify-between pt-4">
                 {step > 1 && (
                   <Button

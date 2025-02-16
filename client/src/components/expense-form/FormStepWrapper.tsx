@@ -7,8 +7,8 @@ interface FormStepWrapperProps {
 
 export default function FormStepWrapper({ children, show }: FormStepWrapperProps) {
   return (
-    <div className="relative">
-      <AnimatePresence>
+    <div className="min-h-[300px] relative">
+      <AnimatePresence mode="wait" initial={false}>
         {show && (
           <motion.div
             layout
@@ -20,7 +20,7 @@ export default function FormStepWrapper({ children, show }: FormStepWrapperProps
               opacity: { duration: 0.2 },
               x: { duration: 0.2 }
             }}
-            className="absolute inset-0 space-y-4"
+            className="absolute inset-0 w-full"
           >
             {children}
           </motion.div>
