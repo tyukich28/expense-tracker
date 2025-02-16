@@ -174,9 +174,14 @@ export default function ExpenseForm() {
                   render={({ field }) => (
                     <FormItem>
                       <Select
-                        defaultValue={field.value}
+                        value={field.value}
                         onValueChange={(value) => {
                           field.onChange(value);
+                          form.setValue("user", value, {
+                            shouldValidate: false,
+                            shouldDirty: true,
+                            shouldTouch: true,
+                          });
                         }}
                       >
                         <SelectTrigger className="focus:scale-105 transition-transform duration-200">
