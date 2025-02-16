@@ -153,22 +153,15 @@ export default function ExpenseForm() {
     }
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (step === 7) {
-      form.handleSubmit((data) => {
-        mutate(data);
-      })(e);
-    }
-  };
-
   return (
     <div className="h-screen bg-[#D8E2C6] bg-gradient-radial from-[#D8E2C6] to-[#F0E5D4] p-8 flex items-center justify-center overflow-hidden">
       <Card className="w-full max-w-xl aspect-[4/3] mx-auto bg-[#F0E5D4] rounded-2xl shadow-[0px_10px_30px_rgba(0,0,0,0.05)]">
         <CardContent className="p-6 h-full">
           <Form {...form}>
             <form
-              onSubmit={handleSubmit}
+              onSubmit={(e) => {
+                e.preventDefault();
+              }}
               className="h-full flex flex-col"
             >
               <ProgressBar currentStep={step} totalSteps={7} />
@@ -430,7 +423,10 @@ export default function ExpenseForm() {
                   </Button>
                 ) : (
                   <Button
-                    type="submit"
+                    type="button"
+                    onClick={() => {
+                      form.handleSubmit((data) => mutate(data))();
+                    }}
                     className="ml-auto text-lg px-6 py-3 bg-[#D8E2C6] hover:bg-[#c8d2b6] text-foreground hover:translate-y-[-2px] hover:scale-[1.02] transition-all duration-200"
                   >
                     Submit
