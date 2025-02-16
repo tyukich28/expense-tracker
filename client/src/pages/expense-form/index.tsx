@@ -9,7 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { cn } from "@/lib/utils";
-import { CalendarIcon, PaperclipIcon } from "lucide-react";
+import { CalendarIcon, PaperclipIcon, Camera } from "lucide-react";
 import { format } from "date-fns";
 import { useToast } from "@/hooks/use-toast";
 import { useMutation } from "@tanstack/react-query";
@@ -34,6 +34,7 @@ export default function ExpenseForm() {
   const [step, setStep] = useState(1);
   const { toast } = useToast();
   const [file, setFile] = useState<File | null>(null);
+  const [useCamera, setUseCamera] = useState(false);
 
   // Debug state changes
   useEffect(() => {
@@ -54,22 +55,25 @@ export default function ExpenseForm() {
     return () => subscription.unsubscribe();
   }, [form]);
 
-  // Cleanup on unmount
-  useEffect(() => {
-    return () => {
-      console.log('Component unmounting - cleaning up form state');
-      form.reset(defaultValues);
-    };
-  }, []);
-
   const { mutate } = useMutation({
     mutationFn: async (data: any) => {
       console.log('Submitting form data:', data);
       try {
+        // Format date to ISO string before sending
+        const formattedData = {
+          ...data,
+          date: data.date.toISOString(),
+        };
+
         if (file) {
-          data.receiptUrl = URL.createObjectURL(file);
+          formattedData.receiptUrl = URL.createObjectURL(file);
         }
-        const res = await apiRequest("POST", "/api/expenses", data);
+
+        const res = await apiRequest("POST", "/api/expenses", formattedData);
+        if (!res.ok) {
+          const errorData = await res.json();
+          throw new Error(errorData.error || 'Failed to save expense');
+        }
         return res.json();
       } catch (error) {
         console.error('Mutation error:', error);
@@ -89,7 +93,7 @@ export default function ExpenseForm() {
       console.error('Form submission error:', error);
       toast({
         title: "Error",
-        description: "Failed to save expense",
+        description: error instanceof Error ? error.message : "Failed to save expense",
         variant: "destructive",
       });
     },
@@ -148,6 +152,30 @@ export default function ExpenseForm() {
       }
     } catch (error) {
       console.error('File upload error:', error);
+    }
+  };
+
+  const handleCameraCapture = async () => {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+      setUseCamera(true);
+      // Create video element for preview
+      const video = document.createElement('video');
+      video.srcObject = stream;
+      video.play();
+
+      // After capturing, stop the stream
+      setTimeout(() => {
+        stream.getTracks().forEach(track => track.stop());
+        setUseCamera(false);
+      }, 100);
+    } catch (error) {
+      console.error('Error accessing camera:', error);
+      toast({
+        title: "Camera Error",
+        description: "Unable to access camera. Please check your permissions.",
+        variant: "destructive",
+      });
     }
   };
 
@@ -313,6 +341,9 @@ export default function ExpenseForm() {
                             selected={field.value}
                             onSelect={field.onChange}
                             initialFocus
+                            captionLayout="dropdown-buttons"
+                            fromYear={2020}
+                            toYear={2025}
                           />
                         </PopoverContent>
                       </Popover>
@@ -332,7 +363,16 @@ export default function ExpenseForm() {
                     onClick={() => document.getElementById('receipt-upload')?.click()}
                   >
                     <PaperclipIcon className="h-4 w-4 mr-2" />
-                    Upload
+                    Upload File
+                  </Button>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    className="flex-1 bg-[#D8E2C6] hover:bg-[#c8d2b6] text-foreground hover:scale-[1.02] transition-all duration-200"
+                    onClick={handleCameraCapture}
+                  >
+                    <Camera className="h-4 w-4 mr-2" />
+                    Take Photo
                   </Button>
                 </div>
                 <input
@@ -341,6 +381,7 @@ export default function ExpenseForm() {
                   accept="image/*"
                   className="hidden"
                   onChange={handleFileUpload}
+                  capture="environment"
                 />
                 {file && (
                   <p className="mt-2 text-sm text-muted-foreground">
