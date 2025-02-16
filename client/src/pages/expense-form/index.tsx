@@ -191,7 +191,10 @@ export default function ExpenseForm() {
           <Form {...form}>
             <form onSubmit={form.handleSubmit((data) => {
               console.log('Form submitted:', data);
-              mutate(data);
+              // Only mutate when the form is actually submitted
+              if (step === 7) {
+                mutate(data);
+              }
             })} className="space-y-6">
               <ProgressBar currentStep={step} totalSteps={7} />
 
