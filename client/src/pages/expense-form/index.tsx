@@ -6,11 +6,10 @@ import { Button } from "@/components/ui/button";
 import { Form } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Textarea } from "@/components/ui/textarea";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { cn } from "@/lib/utils";
-import { CalendarIcon } from "lucide-react";
+import { CalendarIcon, PaperclipIcon, Camera } from "lucide-react";
 import { format } from "date-fns";
 import { useToast } from "@/hooks/use-toast";
 import { useMutation } from "@tanstack/react-query";
@@ -40,10 +39,7 @@ export default function ExpenseForm() {
 
   const { mutate } = useMutation({
     mutationFn: async (data: any) => {
-      // Handle file upload if a file is selected
       if (file) {
-        // In a real app, we would upload the file to a storage service
-        // and get back a URL to store in the database
         data.receiptUrl = URL.createObjectURL(file);
       }
       const res = await apiRequest("POST", "/api/expenses", data);
@@ -83,8 +79,6 @@ export default function ExpenseForm() {
   const handleCameraCapture = async () => {
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ video: true });
-      // In a real app, we would handle capturing the photo here
-      // For now, we'll just stop the stream
       stream.getTracks().forEach(track => track.stop());
     } catch (err) {
       console.error('Error accessing camera:', err);
@@ -97,7 +91,7 @@ export default function ExpenseForm() {
   };
 
   return (
-    <div className="min-h-screen bg-[#D8E2C6] bg-gradient-to-br from-[#D8E2C6] to-[#F7F8F5] p-4">
+    <div className="min-h-screen bg-[#B9DCA9] bg-gradient-to-br from-[#B9DCA9] to-[#F7F8F5] p-4">
       <Card className="max-w-lg mx-auto bg-[#F7F8F5]">
         <CardContent className="p-6">
           <Form {...form}>
@@ -127,7 +121,7 @@ export default function ExpenseForm() {
                   name="category"
                   onValueChange={(value) => {
                     form.setValue("category", value);
-                    form.setValue("subCategory", ""); // Reset sub-category when category changes
+                    form.setValue("subCategory", "");
                   }}
                 >
                   <SelectTrigger>
@@ -165,19 +159,20 @@ export default function ExpenseForm() {
               </FormStepWrapper>
 
               <FormStepWrapper show={step === 4}>
-                <h2 className="text-xl font-semibold mb-4">Miscellaneous Description</h2>
+                <h2 className="text-xl font-semibold mb-4">
+                  {form.watch("category") === "Misc (please describe)" 
+                    ? "If you chose \"Misc Category\", please describe the expense category"
+                    : "Description (Optional)"}
+                </h2>
                 <Input
                   type="text"
                   placeholder="Enter description..."
                   {...form.register("description")}
-                  className={cn(
-                    form.watch("category") !== "Misc (please describe)" && "hidden"
-                  )}
                 />
               </FormStepWrapper>
 
               <FormStepWrapper show={step === 5}>
-                <h2 className="text-xl font-semibold mb-4">Enter Amount</h2>
+                <h2 className="text-xl font-semibold mb-4">Enter amount in CAD</h2>
                 <Input
                   type="number"
                   step="0.01"
@@ -209,7 +204,7 @@ export default function ExpenseForm() {
                           onValueChange={(year) => {
                             const newDate = new Date(form.watch("date"));
                             newDate.setFullYear(parseInt(year));
-                            form.setValue("date", newDate);
+                            form.setValue("date", newDate, { shouldValidate: true });
                           }}
                         >
                           <SelectTrigger className="w-[120px]">
@@ -228,7 +223,7 @@ export default function ExpenseForm() {
                           onValueChange={(month) => {
                             const newDate = new Date(form.watch("date"));
                             newDate.setMonth(parseInt(month) - 1);
-                            form.setValue("date", newDate);
+                            form.setValue("date", newDate, { shouldValidate: true });
                           }}
                         >
                           <SelectTrigger className="w-[120px]">
@@ -247,7 +242,7 @@ export default function ExpenseForm() {
                     <Calendar
                       mode="single"
                       selected={form.watch("date")}
-                      onSelect={(date) => form.setValue("date", date!)}
+                      onSelect={(date) => form.setValue("date", date!, { shouldValidate: true })}
                       initialFocus
                     />
                   </PopoverContent>
@@ -260,18 +255,20 @@ export default function ExpenseForm() {
                   <Button
                     type="button"
                     variant="outline"
-                    className="flex-1"
+                    className="flex-1 bg-[#B9DCA9] hover:bg-[#a8cb98] text-foreground"
                     onClick={() => document.getElementById('receipt-upload')?.click()}
                   >
-                    Upload File
+                    <PaperclipIcon className="h-4 w-4 mr-2" />
+                    Upload a File
                   </Button>
                   <Button
                     type="button"
                     variant="outline"
-                    className="flex-1"
+                    className="flex-1 bg-[#B9DCA9] hover:bg-[#a8cb98] text-foreground"
                     onClick={handleCameraCapture}
                   >
-                    Take Photo
+                    <Camera className="h-4 w-4 mr-2" />
+                    Take a Photo
                   </Button>
                 </div>
                 <input
@@ -286,11 +283,6 @@ export default function ExpenseForm() {
                     Selected: {file.name}
                   </p>
                 )}
-                <Textarea
-                  placeholder="Additional notes..."
-                  className="mt-4"
-                  {...form.register("notes")}
-                />
               </FormStepWrapper>
 
               <div className="flex justify-between pt-4">
@@ -300,11 +292,18 @@ export default function ExpenseForm() {
                   </Button>
                 )}
                 {step < 7 ? (
-                  <Button type="button" onClick={nextStep} className="ml-auto">
+                  <Button 
+                    type="button" 
+                    onClick={nextStep} 
+                    className="ml-auto bg-[#B9DCA9] hover:bg-[#a8cb98] text-foreground"
+                  >
                     Next
                   </Button>
                 ) : (
-                  <Button type="submit" className="ml-auto">
+                  <Button 
+                    type="submit" 
+                    className="ml-auto bg-[#B9DCA9] hover:bg-[#a8cb98] text-foreground"
+                  >
                     Submit
                   </Button>
                 )}
