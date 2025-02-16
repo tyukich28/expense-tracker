@@ -107,40 +107,40 @@ export default function ExpenseForm() {
     }
   };
 
-  const nextStep = () => {
-    if (canProceed()) {
-      setStep((s) => Math.min(s + 1, 7));
-    } else {
-      toast({
-        title: "Required Field",
-        description: "Please fill in the required information before proceeding.",
-        variant: "destructive",
-      });
-    }
-  };
-
-  const prevStep = () => setStep((s) => Math.max(s - 1, 1));
-
+  // File upload handler
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files?.[0]) {
-      setFile(e.target.files[0]);
+    const selectedFile = e.target.files?.[0];
+    if (selectedFile) {
+      setFile(selectedFile);
     }
   };
 
+  // Camera capture handler
   const handleCameraCapture = async () => {
     try {
+      if (!navigator.mediaDevices?.getUserMedia) {
+        throw new Error('Camera not supported');
+      }
+
       const stream = await navigator.mediaDevices.getUserMedia({ video: true });
       setUseCamera(true);
+
+      // Create video element for preview
       const video = document.createElement('video');
       video.srcObject = stream;
-      video.play();
+      await video.play();
 
-      setTimeout(() => {
+      // Cleanup function
+      const cleanup = () => {
         stream.getTracks().forEach(track => track.stop());
         setUseCamera(false);
-      }, 100);
+      };
+
+      // Auto cleanup after short delay
+      setTimeout(cleanup, 100);
+
     } catch (error) {
-      console.error('Error accessing camera:', error);
+      setUseCamera(false);
       toast({
         title: "Camera Error",
         description: "Unable to access camera. Please check your permissions.",
@@ -176,11 +176,10 @@ export default function ExpenseForm() {
                       <Select
                         value={field.value}
                         onValueChange={(value) => {
-                          field.onChange(value);
                           form.setValue("user", value, {
                             shouldValidate: false,
                             shouldDirty: true,
-                            shouldTouch: true,
+                            shouldTouch: false,
                           });
                         }}
                       >
@@ -380,7 +379,7 @@ export default function ExpenseForm() {
                   <Button
                     type="button"
                     variant="outline"
-                    onClick={prevStep}
+                    onClick={() => setStep(s => Math.max(s - 1, 1))}
                     className="hover:translate-y-[-1px] transition-transform duration-200"
                   >
                     Previous
@@ -389,7 +388,17 @@ export default function ExpenseForm() {
                 {step < 7 ? (
                   <Button
                     type="button"
-                    onClick={nextStep}
+                    onClick={() => {
+                      if (canProceed()) {
+                        setStep(s => Math.min(s + 1, 7));
+                      } else {
+                        toast({
+                          title: "Required Field",
+                          description: "Please fill in the required information before proceeding.",
+                          variant: "destructive",
+                        });
+                      }
+                    }}
                     className="ml-auto bg-[#D8E2C6] hover:bg-[#c8d2b6] text-foreground hover:translate-y-[-2px] hover:scale-[1.02] transition-all duration-200"
                   >
                     Next
