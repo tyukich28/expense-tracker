@@ -158,11 +158,11 @@ export default function ExpenseForm() {
             >
               <ProgressBar currentStep={step} totalSteps={7} />
 
-              <div className="flex-1 mt-4">
+              <div className="flex-1 mt-6">
                 <FormStepWrapper show={step === 1} key="step-1">
-                  <div className="space-y-3">
-                    <h2 className="text-2xl font-bold">Expense Tracker</h2>
-                    <p className="text-gray-600">Let's track your expenses!</p>
+                  <div className="space-y-4">
+                    <h2 className="text-3xl font-bold">Expense Tracker</h2>
+                    <p className="text-gray-600 text-lg">Let's track your expenses!</p>
                     <FormField
                       control={form.control}
                       name="user"
@@ -172,15 +172,15 @@ export default function ExpenseForm() {
                             defaultValue={field.value}
                             onValueChange={field.onChange}
                           >
-                            <SelectTrigger>
+                            <SelectTrigger className="h-12 text-lg">
                               <SelectValue placeholder="Select User" />
                             </SelectTrigger>
                             <SelectContent>
-                              <SelectItem value="Tyler">Tyler</SelectItem>
-                              <SelectItem value="Alexa">Alexa</SelectItem>
+                              <SelectItem value="Tyler" className="text-lg">Tyler</SelectItem>
+                              <SelectItem value="Alexa" className="text-lg">Alexa</SelectItem>
                             </SelectContent>
                           </Select>
-                          <FormMessage />
+                          <FormMessage className="text-base" />
                         </FormItem>
                       )}
                     />
@@ -188,7 +188,7 @@ export default function ExpenseForm() {
                 </FormStepWrapper>
                 <FormStepWrapper show={step === 2} key="step-2">
                   <div className="space-y-4">
-                    <h2 className="text-xl font-semibold">Select Category</h2>
+                    <h2 className="text-2xl font-semibold">Select Category</h2>
                     <FormField
                       control={form.control}
                       name="category"
@@ -201,18 +201,18 @@ export default function ExpenseForm() {
                               form.setValue("subCategory", "");
                             }}
                           >
-                            <SelectTrigger className="focus:scale-105 transition-transform duration-200">
+                            <SelectTrigger className="h-12 text-lg">
                               <SelectValue placeholder="Select Category" />
                             </SelectTrigger>
                             <SelectContent>
                               {Object.keys(categories).map((category) => (
-                                <SelectItem key={category} value={category}>
+                                <SelectItem key={category} value={category} className="text-lg">
                                   {category}
                                 </SelectItem>
                               ))}
                             </SelectContent>
                           </Select>
-                          <FormMessage />
+                          <FormMessage className="text-base" />
                         </FormItem>
                       )}
                     />
@@ -220,7 +220,7 @@ export default function ExpenseForm() {
                 </FormStepWrapper>
                 <FormStepWrapper show={step === 3} key="step-3">
                   <div className="space-y-4">
-                    <h2 className="text-xl font-semibold">Select Sub-Category</h2>
+                    <h2 className="text-2xl font-semibold">Select Sub-Category</h2>
                     <FormField
                       control={form.control}
                       name="subCategory"
@@ -231,19 +231,19 @@ export default function ExpenseForm() {
                             onValueChange={field.onChange}
                             disabled={!form.getValues("category")}
                           >
-                            <SelectTrigger className="focus:scale-105 transition-transform duration-200">
+                            <SelectTrigger className="h-12 text-lg">
                               <SelectValue placeholder="Select Sub-Category" />
                             </SelectTrigger>
                             <SelectContent>
                               {form.getValues("category") &&
                                 categories[form.getValues("category") as keyof typeof categories]?.map((sub) => (
-                                  <SelectItem key={sub} value={sub}>
+                                  <SelectItem key={sub} value={sub} className="text-lg">
                                     {sub}
                                   </SelectItem>
                                 ))}
                             </SelectContent>
                           </Select>
-                          <FormMessage />
+                          <FormMessage className="text-base" />
                         </FormItem>
                       )}
                     />
@@ -251,7 +251,7 @@ export default function ExpenseForm() {
                 </FormStepWrapper>
                 <FormStepWrapper show={step === 4} key="step-4">
                   <div className="space-y-4">
-                    <h2 className="text-xl font-semibold">Description (Optional)</h2>
+                    <h2 className="text-2xl font-semibold">Description (Optional)</h2>
                     <FormField
                       control={form.control}
                       name="description"
@@ -259,10 +259,10 @@ export default function ExpenseForm() {
                         <FormItem>
                           <Input
                             placeholder="Enter description..."
-                            className="focus:scale-105 transition-transform duration-200"
+                            className="h-12 text-lg focus:scale-105 transition-transform duration-200"
                             {...field}
                           />
-                          <FormMessage />
+                          <FormMessage className="text-base" />
                         </FormItem>
                       )}
                     />
@@ -270,7 +270,7 @@ export default function ExpenseForm() {
                 </FormStepWrapper>
                 <FormStepWrapper show={step === 5} key="step-5">
                   <div className="space-y-4">
-                    <h2 className="text-xl font-semibold">Enter Amount (CAD)</h2>
+                    <h2 className="text-2xl font-semibold">Enter Amount (CAD)</h2>
                     <FormField
                       control={form.control}
                       name="amount"
@@ -280,10 +280,10 @@ export default function ExpenseForm() {
                             type="number"
                             step="0.01"
                             placeholder="0.00"
-                            className="focus:scale-105 transition-transform duration-200"
+                            className="h-12 text-lg focus:scale-105 transition-transform duration-200"
                             {...field}
                           />
-                          <FormMessage />
+                          <FormMessage className="text-base" />
                         </FormItem>
                       )}
                     />
@@ -291,7 +291,7 @@ export default function ExpenseForm() {
                 </FormStepWrapper>
                 <FormStepWrapper show={step === 6} key="step-6">
                   <div className="space-y-4">
-                    <h2 className="text-xl font-semibold">Select Date</h2>
+                    <h2 className="text-2xl font-semibold">Select Date</h2>
                     <FormField
                       control={form.control}
                       name="date"
@@ -302,7 +302,7 @@ export default function ExpenseForm() {
                               <Button
                                 variant={"outline"}
                                 className={cn(
-                                  "w-full justify-start text-left font-normal focus:scale-105 transition-transform duration-200",
+                                  "w-full justify-start text-left font-normal text-lg focus:scale-105 transition-transform duration-200 px-6 py-3",
                                   !field.value && "text-muted-foreground"
                                 )}
                               >
@@ -332,7 +332,7 @@ export default function ExpenseForm() {
                               />
                             </PopoverContent>
                           </Popover>
-                          <FormMessage />
+                          <FormMessage className="text-base" />
                         </FormItem>
                       )}
                     />
@@ -340,12 +340,12 @@ export default function ExpenseForm() {
                 </FormStepWrapper>
                 <FormStepWrapper show={step === 7} key="step-7">
                   <div className="space-y-4">
-                    <h2 className="text-xl font-semibold">Upload Receipt</h2>
+                    <h2 className="text-2xl font-semibold">Upload Receipt</h2>
                     <div className="flex gap-4">
                       <Button
                         type="button"
                         variant="outline"
-                        className="flex-1 bg-[#D8E2C6] hover:bg-[#c8d2b6] text-foreground hover:scale-[1.02] transition-all duration-200"
+                        className="flex-1 text-lg px-6 py-3 bg-[#D8E2C6] hover:bg-[#c8d2b6] text-foreground hover:scale-[1.02] transition-all duration-200"
                         onClick={() => document.getElementById('receipt-upload')?.click()}
                       >
                         <PaperclipIcon className="h-4 w-4 mr-2" />
@@ -354,7 +354,7 @@ export default function ExpenseForm() {
                       <Button
                         type="button"
                         variant="outline"
-                        className="flex-1 bg-[#D8E2C6] hover:bg-[#c8d2b6] text-foreground hover:scale-[1.02] transition-all duration-200"
+                        className="flex-1 text-lg px-6 py-3 bg-[#D8E2C6] hover:bg-[#c8d2b6] text-foreground hover:scale-[1.02] transition-all duration-200"
                         onClick={handleCameraCapture}
                       >
                         <Camera className="h-4 w-4 mr-2" />
@@ -378,13 +378,13 @@ export default function ExpenseForm() {
                 </FormStepWrapper>
               </div>
 
-              <div className="flex justify-between pt-4 mt-auto border-t">
+              <div className="flex justify-between pt-6 mt-auto border-t">
                 {step > 1 && (
                   <Button
                     type="button"
                     variant="outline"
                     onClick={() => setStep(s => Math.max(s - 1, 1))}
-                    className="hover:translate-y-[-1px] transition-transform duration-200"
+                    className="text-lg px-6 py-3 hover:translate-y-[-1px] transition-transform duration-200"
                   >
                     Previous
                   </Button>
@@ -403,14 +403,14 @@ export default function ExpenseForm() {
                         });
                       }
                     }}
-                    className="ml-auto bg-[#D8E2C6] hover:bg-[#c8d2b6] text-foreground hover:translate-y-[-2px] hover:scale-[1.02] transition-all duration-200"
+                    className="ml-auto text-lg px-6 py-3 bg-[#D8E2C6] hover:bg-[#c8d2b6] text-foreground hover:translate-y-[-2px] hover:scale-[1.02] transition-all duration-200 z-10"
                   >
                     Next
                   </Button>
                 ) : (
                   <Button
                     type="submit"
-                    className="ml-auto bg-[#D8E2C6] hover:bg-[#c8d2b6] text-foreground hover:translate-y-[-2px] hover:scale-[1.02] transition-all duration-200"
+                    className="ml-auto text-lg px-6 py-3 bg-[#D8E2C6] hover:bg-[#c8d2b6] text-foreground hover:translate-y-[-2px] hover:scale-[1.02] transition-all duration-200 z-10"
                   >
                     Submit
                   </Button>
