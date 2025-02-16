@@ -70,17 +70,18 @@ export default function ExpenseForm() {
   const canProceed = () => {
     switch (step) {
       case 1:
-        return !!form.watch("user");
+        return !!form.getValues("user");
       case 2:
-        return !!form.watch("category");
+        return !!form.getValues("category");
       case 3:
-        return !!form.watch("subCategory");
+        return !!form.getValues("subCategory");
       case 4:
         return true; // Optional step
       case 5:
-        return !!form.watch("amount") && !isNaN(parseFloat(form.watch("amount")));
+        const amount = form.getValues("amount");
+        return !!amount && !isNaN(parseFloat(amount));
       case 6:
-        return !!form.watch("date");
+        return !!form.getValues("date");
       case 7:
         return true; // Optional step
       default:
@@ -197,14 +198,14 @@ export default function ExpenseForm() {
                       <Select
                         value={field.value}
                         onValueChange={field.onChange}
-                        disabled={!form.watch("category")}
+                        disabled={!form.getValues("category")}
                       >
                         <SelectTrigger className="focus:scale-105 transition-transform">
                           <SelectValue placeholder="Select Sub-Category" />
                         </SelectTrigger>
                         <SelectContent>
-                          {form.watch("category") &&
-                            categories[form.watch("category") as keyof typeof categories].map((sub) => (
+                          {form.getValues("category") &&
+                            categories[form.getValues("category") as keyof typeof categories]?.map((sub) => (
                               <SelectItem key={sub} value={sub}>
                                 {sub}
                               </SelectItem>
@@ -264,20 +265,20 @@ export default function ExpenseForm() {
                       variant={"outline"}
                       className={cn(
                         "w-full justify-start text-left font-normal focus:scale-105 transition-transform",
-                        !form.watch("date") && "text-muted-foreground"
+                        !form.getValues("date") && "text-muted-foreground"
                       )}
                     >
                       <CalendarIcon className="mr-2 h-4 w-4" />
-                      {form.watch("date") ? format(form.watch("date"), "PPP") : <span>Pick a date</span>}
+                      {form.getValues("date") ? format(form.getValues("date"), "PPP") : <span>Pick a date</span>}
                     </Button>
                   </PopoverTrigger>
                   <PopoverContent className="w-auto p-0" align="start">
                     <div className="p-3 border-b">
                       <div className="flex justify-between items-center gap-2">
                         <Select
-                          value={form.watch("date")?.getFullYear().toString()}
+                          value={form.getValues("date")?.getFullYear().toString()}
                           onValueChange={(year) => {
-                            const newDate = new Date(form.watch("date"));
+                            const newDate = new Date(form.getValues("date"));
                             newDate.setFullYear(parseInt(year));
                             form.setValue("date", newDate, { shouldValidate: true });
                           }}
@@ -294,9 +295,9 @@ export default function ExpenseForm() {
                           </SelectContent>
                         </Select>
                         <Select
-                          value={(form.watch("date")?.getMonth() + 1).toString()}
+                          value={(form.getValues("date")?.getMonth() + 1).toString()}
                           onValueChange={(month) => {
-                            const newDate = new Date(form.watch("date"));
+                            const newDate = new Date(form.getValues("date"));
                             newDate.setMonth(parseInt(month) - 1);
                             form.setValue("date", newDate, { shouldValidate: true });
                           }}
@@ -316,7 +317,7 @@ export default function ExpenseForm() {
                     </div>
                     <Calendar
                       mode="single"
-                      selected={form.watch("date")}
+                      selected={form.getValues("date")}
                       onSelect={(date) => form.setValue("date", date!, { shouldValidate: true })}
                       initialFocus
                     />
