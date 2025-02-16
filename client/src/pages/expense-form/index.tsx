@@ -157,7 +157,6 @@ export default function ExpenseForm() {
     e.preventDefault();
     if (step === 7) {
       form.handleSubmit((data) => {
-        // Proceed with submission
         mutate(data);
       })(e);
     }
