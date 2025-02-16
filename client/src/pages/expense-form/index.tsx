@@ -38,7 +38,7 @@ export default function ExpenseForm() {
   const form = useForm({
     resolver: zodResolver(insertExpenseSchema),
     defaultValues,
-    mode: "onSubmit",
+    mode: "onChange",
   });
 
   const { mutate } = useMutation({
@@ -107,7 +107,6 @@ export default function ExpenseForm() {
     }
   };
 
-  // File upload handler
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const selectedFile = e.target.files?.[0];
     if (selectedFile) {
@@ -115,7 +114,6 @@ export default function ExpenseForm() {
     }
   };
 
-  // Camera capture handler
   const handleCameraCapture = async () => {
     try {
       if (!navigator.mediaDevices?.getUserMedia) {
@@ -125,19 +123,14 @@ export default function ExpenseForm() {
       const stream = await navigator.mediaDevices.getUserMedia({ video: true });
       setUseCamera(true);
 
-      // Create video element for preview
       const video = document.createElement('video');
       video.srcObject = stream;
       await video.play();
 
-      // Cleanup function
-      const cleanup = () => {
+      setTimeout(() => {
         stream.getTracks().forEach(track => track.stop());
         setUseCamera(false);
-      };
-
-      // Auto cleanup after short delay
-      setTimeout(cleanup, 100);
+      }, 100);
 
     } catch (error) {
       setUseCamera(false);
@@ -172,15 +165,11 @@ export default function ExpenseForm() {
                   control={form.control}
                   name="user"
                   render={({ field }) => (
-                    <FormItem>
+                    <FormItem className="relative">
                       <Select
-                        value={field.value}
+                        defaultValue={field.value}
                         onValueChange={(value) => {
-                          form.setValue("user", value, {
-                            shouldValidate: false,
-                            shouldDirty: true,
-                            shouldTouch: false,
-                          });
+                          field.onChange(value);
                         }}
                       >
                         <SelectTrigger className="focus:scale-105 transition-transform duration-200">
