@@ -8,11 +8,11 @@ export interface NotionExpense {
   user: string;
   category: string;
   subCategory: string;
-  description?: string;
+  description?: string | null;
   amount: string;
   date: string;
-  receiptUrl?: string;
-  notes?: string;
+  receiptUrl?: string | null;
+  notes?: string | null;
 }
 
 export async function addExpenseToNotion(expense: NotionExpense) {
@@ -62,8 +62,8 @@ export async function addExpenseToNotion(expense: NotionExpense) {
           },
         },
         Receipt: {
-          type: "url",
-          url: expense.receiptUrl || null,
+          type: "files",
+          files: []  // Initialize as empty array since we're not uploading files directly to Notion
         },
         Notes: {
           type: "rich_text",
