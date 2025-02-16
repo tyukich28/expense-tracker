@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Card, CardContent } from "@/components/ui/card";
@@ -9,7 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { cn } from "@/lib/utils";
-import { CalendarIcon, PaperclipIcon, Camera } from "lucide-react";
+import { CalendarIcon, PaperclipIcon } from "lucide-react";
 import { format } from "date-fns";
 import { useToast } from "@/hooks/use-toast";
 import { useMutation } from "@tanstack/react-query";
@@ -18,6 +18,7 @@ import { insertExpenseSchema, categories } from "@shared/schema";
 import FormStepWrapper from "@/components/expense-form/FormStepWrapper";
 import ProgressBar from "@/components/expense-form/ProgressBar";
 
+// Define default values outside component to prevent recreation
 const defaultValues = {
   user: "",
   category: "",
@@ -34,21 +35,36 @@ export default function ExpenseForm() {
   const { toast } = useToast();
   const [file, setFile] = useState<File | null>(null);
 
+  // Debug state changes
+  useEffect(() => {
+    console.log('Step changed:', step);
+  }, [step]);
+
   const form = useForm({
     resolver: zodResolver(insertExpenseSchema),
     defaultValues,
     mode: "onChange",
   });
 
-  // Cleanup form on unmount
+  // Debug form state
+  useEffect(() => {
+    const subscription = form.watch((value) => {
+      console.log('Form state updated:', value);
+    });
+    return () => subscription.unsubscribe();
+  }, [form]);
+
+  // Cleanup on unmount
   useEffect(() => {
     return () => {
+      console.log('Component unmounting - cleaning up form state');
       form.reset(defaultValues);
     };
   }, []);
 
   const { mutate } = useMutation({
     mutationFn: async (data: any) => {
+      console.log('Submitting form data:', data);
       try {
         if (file) {
           data.receiptUrl = URL.createObjectURL(file);
@@ -70,7 +86,7 @@ export default function ExpenseForm() {
       setStep(1);
     },
     onError: (error) => {
-      console.error('Mutation error:', error);
+      console.error('Form submission error:', error);
       toast({
         title: "Error",
         description: "Failed to save expense",
@@ -79,12 +95,9 @@ export default function ExpenseForm() {
     },
   });
 
-  const onSubmit = useCallback((data: any) => {
-    mutate(data);
-  }, [mutate]);
-
-  const canProceed = useCallback(() => {
+  const canProceed = () => {
     const values = form.getValues();
+    console.log('Checking form values for step', step, values);
 
     switch (step) {
       case 1:
@@ -104,36 +117,49 @@ export default function ExpenseForm() {
       default:
         return false;
     }
-  }, [step, form]);
+  };
 
-  const nextStep = useCallback(() => {
-    if (canProceed()) {
-      setStep((s) => Math.min(s + 1, 7));
-    } else {
-      toast({
-        title: "Required Field",
-        description: "Please fill in the required information before proceeding.",
-        variant: "destructive",
-      });
+  const nextStep = () => {
+    try {
+      if (canProceed()) {
+        setStep((s) => Math.min(s + 1, 7));
+      } else {
+        toast({
+          title: "Required Field",
+          description: "Please fill in the required information before proceeding.",
+          variant: "destructive",
+        });
+      }
+    } catch (error) {
+      console.error('Error in nextStep:', error);
     }
-  }, [canProceed, toast]);
+  };
 
-  const prevStep = useCallback(() => 
-    setStep((s) => Math.max(s - 1, 1)), 
-  []);
+  const prevStep = () => {
+    console.log('Moving to previous step from', step);
+    setStep((s) => Math.max(s - 1, 1));
+  };
 
-  const handleFileUpload = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files?.[0]) {
-      setFile(e.target.files[0]);
+  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    try {
+      if (e.target.files?.[0]) {
+        console.log('File selected:', e.target.files[0].name);
+        setFile(e.target.files[0]);
+      }
+    } catch (error) {
+      console.error('File upload error:', error);
     }
-  }, []);
+  };
 
   return (
     <div className="min-h-screen bg-[#D8E2C6] bg-gradient-radial from-[#D8E2C6] to-[#F0E5D4] p-4">
-      <Card className="max-w-lg mx-auto bg-[#F0E5D4] rounded-2xl shadow-[0px_10px_30px_rgba(0,0,0,0.05)] transform hover:scale-[1.02] transition-all duration-300">
+      <Card className="max-w-lg mx-auto bg-[#F0E5D4] rounded-2xl shadow-[0px_10px_30px_rgba(0,0,0,0.05)]">
         <CardContent className="p-8">
           <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+            <form onSubmit={form.handleSubmit((data) => {
+              console.log('Form submitted:', data);
+              mutate(data);
+            })} className="space-y-6">
               <ProgressBar currentStep={step} totalSteps={7} />
 
               <FormStepWrapper show={step === 1}>
@@ -325,8 +351,8 @@ export default function ExpenseForm() {
 
               <div className="flex justify-between pt-4">
                 {step > 1 && (
-                  <Button 
-                    type="button" 
+                  <Button
+                    type="button"
                     variant="outline"
                     onClick={prevStep}
                     className="hover:translate-y-[-1px] transition-transform duration-200"
