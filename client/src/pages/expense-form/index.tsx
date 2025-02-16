@@ -145,7 +145,7 @@ export default function ExpenseForm() {
   return (
     <div className="h-screen bg-[#D8E2C6] bg-gradient-radial from-[#D8E2C6] to-[#F0E5D4] p-8 flex items-center justify-center overflow-hidden">
       <Card className="w-full max-w-xl aspect-[4/3] mx-auto bg-[#F0E5D4] rounded-2xl shadow-[0px_10px_30px_rgba(0,0,0,0.05)]">
-        <CardContent className="p-6 h-full flex flex-col">
+        <CardContent className="p-6 h-full">
           <Form {...form}>
             <form 
               onSubmit={(e) => {
@@ -158,7 +158,7 @@ export default function ExpenseForm() {
             >
               <ProgressBar currentStep={step} totalSteps={7} />
 
-              <div className="flex-1 mt-6">
+              <div className="relative flex-1 mt-6">
                 <FormStepWrapper show={step === 1} key="step-1">
                   <div className="space-y-4">
                     <h2 className="text-3xl font-bold">Expense Tracker</h2>
@@ -167,7 +167,7 @@ export default function ExpenseForm() {
                       control={form.control}
                       name="user"
                       render={({ field }) => (
-                        <FormItem>
+                        <FormItem className="space-y-3">
                           <Select
                             defaultValue={field.value}
                             onValueChange={field.onChange}
@@ -409,14 +409,14 @@ export default function ExpenseForm() {
                         });
                       }
                     }}
-                    className="ml-auto text-lg px-6 py-3 bg-[#D8E2C6] hover:bg-[#c8d2b6] text-foreground hover:translate-y-[-2px] hover:scale-[1.02] transition-all duration-200 z-10"
+                    className="ml-auto text-lg px-6 py-3 bg-[#D8E2C6] hover:bg-[#c8d2b6] text-foreground hover:translate-y-[-2px] hover:scale-[1.02] transition-all duration-200"
                   >
                     Next
                   </Button>
                 ) : (
                   <Button
                     type="submit"
-                    className="ml-auto text-lg px-6 py-3 bg-[#D8E2C6] hover:bg-[#c8d2b6] text-foreground hover:translate-y-[-2px] hover:scale-[1.02] transition-all duration-200 z-10"
+                    className="ml-auto text-lg px-6 py-3 bg-[#D8E2C6] hover:bg-[#c8d2b6] text-foreground hover:translate-y-[-2px] hover:scale-[1.02] transition-all duration-200"
                   >
                     Submit
                   </Button>

@@ -7,7 +7,7 @@ interface FormStepWrapperProps {
 
 export default function FormStepWrapper({ children, show }: FormStepWrapperProps) {
   return (
-    <div className="relative h-full">
+    <div className="absolute inset-0 w-full">
       <AnimatePresence mode="wait" initial={false}>
         {show && (
           <motion.div
@@ -20,7 +20,7 @@ export default function FormStepWrapper({ children, show }: FormStepWrapperProps
               opacity: { duration: 0.2 },
               x: { duration: 0.2 }
             }}
-            className="absolute inset-0 w-full"
+            className="h-full flex flex-col"
           >
             {children}
           </motion.div>
