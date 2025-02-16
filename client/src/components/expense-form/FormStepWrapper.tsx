@@ -1,3 +1,5 @@
+import { motion } from "framer-motion";
+
 interface FormStepWrapperProps {
   children: React.ReactNode;
   show: boolean;
@@ -5,17 +7,16 @@ interface FormStepWrapperProps {
 
 export default function FormStepWrapper({ children, show }: FormStepWrapperProps) {
   if (!show) return null;
+
   return (
-    <div 
-      className={`
-        opacity-0 translate-y-4 
-        animate-in fade-in slide-in-from-bottom-4 
-        duration-300 ease-out 
-        data-[state=entered]:opacity-100 
-        data-[state=entered]:translate-y-0
-      `}
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: -20 }}
+      transition={{ duration: 0.3, ease: "easeOut" }}
+      className="space-y-4"
     >
       {children}
-    </div>
+    </motion.div>
   );
 }
