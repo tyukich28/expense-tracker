@@ -44,21 +44,27 @@ export default function ExpenseForm() {
   const { mutate } = useMutation({
     mutationFn: async (data: any) => {
       try {
-        const formattedData = {
-          ...data,
-          // Format the date as YYYY-MM-DD
-          date: data.date,
-          amount: data.amount.toString(),
-          description: data.description || "",
-          notes: data.notes || "",
-          receiptUrl: data.receiptUrl || ""
-        };
+        // Create FormData to handle file upload
+        const formData = new FormData();
 
+        // Add all form fields to FormData
+        Object.keys(data).forEach(key => {
+          if (key !== 'receiptUrl') {
+            formData.append(key, data[key]);
+          }
+        });
+
+        // If there's a file, append it to FormData
         if (file) {
-          formattedData.receiptUrl = URL.createObjectURL(file);
+          formData.append('receipt', file);
+          formData.append('receiptUrl', URL.createObjectURL(file));
         }
 
-        const res = await apiRequest("POST", "/api/expenses", formattedData);
+        const res = await fetch('/api/expenses', {
+          method: 'POST',
+          body: formData
+        });
+
         if (!res.ok) {
           throw new Error('Failed to save expense');
         }
@@ -112,6 +118,10 @@ export default function ExpenseForm() {
     const selectedFile = e.target.files?.[0];
     if (selectedFile) {
       setFile(selectedFile);
+      toast({
+        title: "Receipt Added",
+        description: "Receipt file has been attached successfully",
+      });
     }
   };
 
@@ -143,18 +153,23 @@ export default function ExpenseForm() {
     }
   };
 
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (step === 7) {
+      form.handleSubmit((data) => {
+        // Proceed with submission
+        mutate(data);
+      })(e);
+    }
+  };
+
   return (
     <div className="h-screen bg-[#D8E2C6] bg-gradient-radial from-[#D8E2C6] to-[#F0E5D4] p-8 flex items-center justify-center overflow-hidden">
       <Card className="w-full max-w-xl aspect-[4/3] mx-auto bg-[#F0E5D4] rounded-2xl shadow-[0px_10px_30px_rgba(0,0,0,0.05)]">
         <CardContent className="p-6 h-full">
           <Form {...form}>
             <form
-              onSubmit={(e) => {
-                e.preventDefault();
-                if (step === 7) {
-                  form.handleSubmit((data) => mutate(data))(e);
-                }
-              }}
+              onSubmit={handleSubmit}
               className="h-full flex flex-col"
             >
               <ProgressBar currentStep={step} totalSteps={7} />

@@ -3,15 +3,30 @@ import { createServer } from "http";
 import { storage } from "./storage";
 import { insertExpenseSchema } from "@shared/schema";
 import { addExpenseToNotion } from "./services/notion";
+import multer from "multer";
+import path from "path";
 
 export async function registerRoutes(app: Express) {
-  app.post("/api/expenses", async (req, res) => {
+  // Configure multer for file uploads
+  const upload = multer({
+    storage: multer.diskStorage({
+      destination: './uploads',
+      filename: (req, file, cb) => {
+        const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+        cb(null, file.fieldname + '-' + uniqueSuffix + path.extname(file.originalname));
+      }
+    })
+  });
+
+  app.post("/api/expenses", upload.single('receipt'), async (req, res) => {
     try {
       // Parse and validate the incoming data
       const expenseData = {
         ...req.body,
         // Convert the date string to a Date object for schema validation
-        date: new Date(req.body.date)
+        date: new Date(req.body.date),
+        // Add the file path if a receipt was uploaded
+        receiptUrl: req.file ? `/uploads/${req.file.filename}` : undefined
       };
 
       const expense = insertExpenseSchema.parse(expenseData);
