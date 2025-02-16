@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Card, CardContent } from "@/components/ui/card";
@@ -18,37 +18,34 @@ import { insertExpenseSchema, categories } from "@shared/schema";
 import FormStepWrapper from "@/components/expense-form/FormStepWrapper";
 import ProgressBar from "@/components/expense-form/ProgressBar";
 
+const defaultValues = {
+  user: "",
+  category: "",
+  subCategory: "",
+  description: "",
+  amount: "",
+  date: new Date(),
+  receiptUrl: "",
+  notes: "",
+};
+
 export default function ExpenseForm() {
   const [step, setStep] = useState(1);
   const { toast } = useToast();
   const [file, setFile] = useState<File | null>(null);
 
-  // Debug logging for form state
-  useEffect(() => {
-    console.log('Current step:', step);
-  }, [step]);
-
   const form = useForm({
     resolver: zodResolver(insertExpenseSchema),
-    defaultValues: {
-      user: "",
-      category: "",
-      subCategory: "",
-      description: "",
-      amount: "",
-      date: new Date(),
-      receiptUrl: "",
-      notes: "",
-    },
+    defaultValues,
+    mode: "onChange",
   });
 
-  // Debug logging for form values
+  // Cleanup form on unmount
   useEffect(() => {
-    const subscription = form.watch((value, { name, type }) => {
-      console.log('Form field changed:', { name, type, value });
-    });
-    return () => subscription.unsubscribe();
-  }, [form.watch]);
+    return () => {
+      form.reset(defaultValues);
+    };
+  }, []);
 
   const { mutate } = useMutation({
     mutationFn: async (data: any) => {
@@ -68,7 +65,7 @@ export default function ExpenseForm() {
         title: "Success",
         description: "Expense saved successfully",
       });
-      form.reset();
+      form.reset(defaultValues);
       setFile(null);
       setStep(1);
     },
@@ -82,79 +79,54 @@ export default function ExpenseForm() {
     },
   });
 
-  const onSubmit = (data: any) => {
-    console.log('Form submission data:', data);
+  const onSubmit = useCallback((data: any) => {
     mutate(data);
-  };
+  }, [mutate]);
 
-  const canProceed = () => {
-    try {
-      const values = form.watch();
-      console.log('Checking form values:', values);
+  const canProceed = useCallback(() => {
+    const values = form.getValues();
 
-      switch (step) {
-        case 1:
-          return !!values.user;
-        case 2:
-          return !!values.category;
-        case 3:
-          return !!values.subCategory;
-        case 4:
-          return true; // Optional step
-        case 5:
-          const amount = values.amount;
-          const isValid = !!amount && !isNaN(parseFloat(amount));
-          console.log('Amount validation:', { amount, isValid });
-          return isValid;
-        case 6:
-          return !!values.date;
-        case 7:
-          return true; // Optional step
-        default:
-          return false;
-      }
-    } catch (error) {
-      console.error('Error in canProceed:', error);
-      return false;
+    switch (step) {
+      case 1:
+        return !!values.user;
+      case 2:
+        return !!values.category;
+      case 3:
+        return !!values.subCategory;
+      case 4:
+        return true;
+      case 5:
+        return !!values.amount && !isNaN(parseFloat(values.amount));
+      case 6:
+        return !!values.date;
+      case 7:
+        return true;
+      default:
+        return false;
     }
-  };
+  }, [step, form]);
 
-  const nextStep = () => {
-    try {
-      if (canProceed()) {
-        setStep((s) => Math.min(s + 1, 7));
-      } else {
-        toast({
-          title: "Required Field",
-          description: "Please fill in the required information before proceeding.",
-          variant: "destructive",
-        });
-      }
-    } catch (error) {
-      console.error('Error in nextStep:', error);
+  const nextStep = useCallback(() => {
+    if (canProceed()) {
+      setStep((s) => Math.min(s + 1, 7));
+    } else {
+      toast({
+        title: "Required Field",
+        description: "Please fill in the required information before proceeding.",
+        variant: "destructive",
+      });
     }
-  };
+  }, [canProceed, toast]);
 
-  const prevStep = () => setStep((s) => Math.max(s - 1, 1));
+  const prevStep = useCallback(() => 
+    setStep((s) => Math.max(s - 1, 1)), 
+  []);
 
-  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    try {
-      if (e.target.files && e.target.files[0]) {
-        setFile(e.target.files[0]);
-      }
-    } catch (error) {
-      console.error('Error in file upload:', error);
+  const handleFileUpload = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files?.[0]) {
+      setFile(e.target.files[0]);
     }
-  };
-
-  const handleCameraCapture = async () => {
-    try {
-      const stream = await navigator.mediaDevices.getUserMedia({ video: true });
-      stream.getTracks().forEach(track => track.stop());
-    } catch (error) {
-      console.error('Error accessing camera:', error);
-    }
-  };
+  }, []);
 
   return (
     <div className="min-h-screen bg-[#D8E2C6] bg-gradient-radial from-[#D8E2C6] to-[#F0E5D4] p-4">
@@ -166,7 +138,7 @@ export default function ExpenseForm() {
 
               <FormStepWrapper show={step === 1}>
                 <h2 className="text-2xl font-bold mb-4">Expense Tracker</h2>
-                <p className="text-gray-600 mb-6">Way to go! Let's build some healthy financial habits 💪🏼</p>
+                <p className="text-gray-600 mb-6">Let's track your expenses!</p>
                 <FormField
                   control={form.control}
                   name="user"
@@ -191,7 +163,7 @@ export default function ExpenseForm() {
               </FormStepWrapper>
 
               <FormStepWrapper show={step === 2}>
-                <h2 className="text-xl font-semibold mb-4">Select an Expense Category:</h2>
+                <h2 className="text-xl font-semibold mb-4">Select Category</h2>
                 <FormField
                   control={form.control}
                   name="category"
@@ -231,14 +203,14 @@ export default function ExpenseForm() {
                       <Select
                         value={field.value}
                         onValueChange={field.onChange}
-                        disabled={!form.watch("category")}
+                        disabled={!form.getValues("category")}
                       >
                         <SelectTrigger className="focus:scale-105 transition-transform duration-200">
                           <SelectValue placeholder="Select Sub-Category" />
                         </SelectTrigger>
                         <SelectContent>
-                          {form.watch("category") &&
-                            categories[form.watch("category") as keyof typeof categories]?.map((sub) => (
+                          {form.getValues("category") &&
+                            categories[form.getValues("category") as keyof typeof categories]?.map((sub) => (
                               <SelectItem key={sub} value={sub}>
                                 {sub}
                               </SelectItem>
@@ -259,7 +231,6 @@ export default function ExpenseForm() {
                   render={({ field }) => (
                     <FormItem>
                       <Input
-                        type="text"
                         placeholder="Enter description..."
                         className="focus:scale-105 transition-transform duration-200"
                         {...field}
@@ -271,7 +242,7 @@ export default function ExpenseForm() {
               </FormStepWrapper>
 
               <FormStepWrapper show={step === 5}>
-                <h2 className="text-xl font-semibold mb-4">Enter amount in CAD</h2>
+                <h2 className="text-xl font-semibold mb-4">Enter Amount (CAD)</h2>
                 <FormField
                   control={form.control}
                   name="amount"
@@ -314,7 +285,7 @@ export default function ExpenseForm() {
                           <Calendar
                             mode="single"
                             selected={field.value}
-                            onSelect={(date) => field.onChange(date)}
+                            onSelect={field.onChange}
                             initialFocus
                           />
                         </PopoverContent>
@@ -335,16 +306,7 @@ export default function ExpenseForm() {
                     onClick={() => document.getElementById('receipt-upload')?.click()}
                   >
                     <PaperclipIcon className="h-4 w-4 mr-2" />
-                    Upload a File
-                  </Button>
-                  <Button
-                    type="button"
-                    variant="outline"
-                    className="flex-1 bg-[#D8E2C6] hover:bg-[#c8d2b6] text-foreground hover:scale-[1.02] transition-all duration-200"
-                    onClick={handleCameraCapture}
-                  >
-                    <Camera className="h-4 w-4 mr-2" />
-                    Take a Photo
+                    Upload
                   </Button>
                 </div>
                 <input
