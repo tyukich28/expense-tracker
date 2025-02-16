@@ -59,10 +59,14 @@ export default function ExpenseForm() {
     mutationFn: async (data: any) => {
       console.log('Submitting form data:', data);
       try {
-        // Format date to ISO string before sending
+        // Format the data according to schema requirements
         const formattedData = {
           ...data,
-          date: data.date.toISOString(),
+          date: data.date.toISOString().split('T')[0], // Format as YYYY-MM-DD
+          amount: data.amount.toString(), // Ensure amount is a string
+          description: data.description || "", // Ensure description is not undefined
+          notes: data.notes || "", // Ensure notes is not undefined
+          receiptUrl: data.receiptUrl || "" // Ensure receiptUrl is not undefined
         };
 
         if (file) {
@@ -72,6 +76,7 @@ export default function ExpenseForm() {
         const res = await apiRequest("POST", "/api/expenses", formattedData);
         if (!res.ok) {
           const errorData = await res.json();
+          console.error('Server response:', errorData);
           throw new Error(errorData.error || 'Failed to save expense');
         }
         return res.json();
