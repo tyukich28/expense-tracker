@@ -1,0 +1,176 @@
+# Replit Prompt (brief)
+
+# Expense Tracker Web App Specification
+
+## Overview
+
+Build a **survey-based expense tracker** with conditional logic, designed for two users. The app should be built with **Flask (Python) for the back-end** and **Next.js (React) for the front-end**, using **Notion API** for data storage. The application is for **personal use only** and should be hosted on **Vercel (front-end) and Render (back-end)**.
+
+## Tech Stack
+
+- **Front-End:** Next.js (React) for a responsive, interactive UI.
+- **Back-End:** Flask (Python) for API handling.
+- **Database:** Notion API (securely store data).
+- **Hosting:**
+    - **Vercel (Next.js Front-End)** → Optimized for static assets, automatic deployments.
+    - **Render (Flask Back-End)** → Supports persistent Flask API execution.
+- **Styling:** Tailwind CSS for a sleek, modern UI.
+
+## Future iOS App Transition Plan
+
+- **Phase 1:** Web app proof of concept (accessible via URL, hosted on Vercel & Render).
+- **Phase 2:** Transition to a **native iOS app** with similar functionality.
+- **Architectural Considerations:**
+    - Ensure **modular, API-driven architecture** so the back-end can support both web and mobile clients.
+    - Use **React Native for the iOS app** to maximize code reuse with Next.js.
+    - Keep UI/UX **mobile-first** in design to ease the iOS transition.
+    - Use **secure API authentication** to accommodate future mobile app access.
+
+## Expected Code Structure
+
+```
+- /frontend → Next.js (React) UI components
+  - /components → Reusable form components
+  - /pages → Next.js pages for each step of the form
+  - /styles → Tailwind CSS stylesheets
+- /backend → Flask API
+  - app.py → Main Flask app
+  - routes.py → API route definitions
+  - notion_integration.py → Handles Notion API interactions
+- .env → Store secrets (e.g., NOTION_API_TOKEN)
+
+```
+
+## Security Notes
+
+- **Do NOT hardcode the Notion API token**. Use an **environment variable (`NOTION_API_TOKEN`)** for security.
+- **Store credentials in `.env` files** or use a secrets manager.
+
+## Expense Data Model (Notion API)
+
+Each expense entry in Notion should follow this structure:
+
+```
+- Expense ID (UUID)
+- User (Dropdown: "Tyler" / "Alexa")
+- Category (Dropdown)
+- Sub-Category (Dropdown)
+- Amount (Currency)
+- Date (Date Picker)
+- Receipt URL (File attachment)
+- Notes (Rich text)
+
+```
+
+## API Optimization (Notion Rate Limits)
+
+- **Batch Requests:** Avoid excessive API calls by batching inserts.
+- **Caching:** Store frequently accessed categories/subcategories locally.
+- **Retry Handling:** Implement exponential backoff if Notion API rejects a request.
+
+## Hosting & Deployment
+
+### **Frontend: Next.js on Vercel**
+
+- **Why Vercel?**
+    - Best free-tier frontend hosting for Next.js.
+    - Automatic deployments from GitHub.
+    - Free HTTPS, CDN, and custom domain support.
+- **Setup:**
+    - Deploy Next.js project via Vercel’s GitHub integration.
+    - Connect the backend API endpoint hosted on Render.
+
+### **Backend: Flask on Render**
+
+- **Why Render?**
+    - Best free-tier hosting for Flask API with persistent execution.
+    - Free plan includes HTTPS, automatic deployments.
+    - Avoids Vercel’s serverless limitations for Flask.
+- **Setup:**
+    - Deploy Flask API on Render.
+    - Configure `.env` variables securely.
+    - Ensure API routes support Next.js frontend requests.
+
+## Form Flow & Logic
+
+### Page 1: Welcome Screen
+
+- **Header:** Expense Tracker
+- **Sub-heading:** Let’s build healthy habits.
+- **Button:** `START ->` (initiates form flow)
+
+### Page 2: Select a Category
+
+- **Dropdown Menu (single select):**
+    - Transportation
+    - Gifts
+    - Fun & Entertainment
+    - Personal Care
+    - Food & Beverage
+    - Rental Property
+    - Home
+    - Yoshi
+    - Misc (please describe)
+- **Buttons:** `<- PREVIOUS`, `NEXT ->`
+
+### Page 3: Select a Sub-Category (Dynamically Filtered)
+
+- **Dropdown Menu:** Filters subcategories based on Page 2 selection
+- **Buttons:** `<- PREVIOUS`, `NEXT ->`
+
+### Page 4: Miscellaneous Expense Description (Conditional)
+
+- **Header:** Describe the expense (optional)
+- **Text Box:** Rich-text formatting (bold, italics, underline)
+- **Buttons:** `<- PREVIOUS`, `NEXT ->`
+
+### Page 5: Enter Expense Amount
+
+- **Numeric Input:** Only allows valid currency values
+- **Buttons:** `<- PREVIOUS`, `NEXT ->`
+
+### Page 6: Select Transaction Date
+
+- **Date Picker:** Defaults to today; users can select past dates
+- **Buttons:** `<- PREVIOUS`, `NEXT ->`
+
+### Page 7: Upload Receipt (Optional)
+
+- **Upload Options:**
+    - `Browse Files` (standard file upload)
+    - `Drag & Drop` (support for drag-and-drop file uploads)
+    - `Camera Capture` (mobile users can take a photo)
+- **Buttons:** `<- PREVIOUS`, `SUBMIT`
+
+## Notion API Integration
+
+- **Environment Variables:**
+    - `NOTION_API_TOKEN`: Used for authentication (never hardcoded).
+- **Expense Data Storage:**
+    - Store each expense entry in a structured Notion database.
+    - Ensure API requests handle retries to avoid rate limits.
+
+## UI & UX Design Guidelines
+
+### Styling
+
+- **Background:** Soft, muted matcha green (#D8E2C6) with a gradient.
+- **Cards:** Off-white (#F7F8F5), rounded corners, subtle shadow.
+- **Typography:** Clean sans-serif (Inter, Work Sans, Manrope, or Lexend).
+- **Buttons:** Deep green with white text, smooth transitions.
+- **Extras:** Progress indicator at bottom.
+
+### User Experience (UX)
+
+- **Mobile & Desktop Support:** Fully responsive layout.
+- **Form Completion:** Users can navigate forward/backward without losing progress.
+- **Animations:** Smooth transitions, hover effects for feedback.
+
+## Final Notes
+
+- **Secure API calls:** Never expose credentials.
+- **Use .env files for secrets management.**
+- **Monitor Vercel & Render usage to ensure free-tier compatibility.**
+- **Ensure architecture supports future transition to a native iOS app.**
+
+This specification is now fully optimized for **Replit AI**, guiding structured code generation, optimal API interactions, and scalability.
